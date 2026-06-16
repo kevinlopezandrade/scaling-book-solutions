@@ -1,41 +1,25 @@
-
-#set page(paper: "a4", margin: (x: 1.75cm, y: 1.85cm))
-#set text(size: 10.5pt)
-#set par(justify: false, leading: 0.62em)
-#set enum(indent: 1.2em)
-#set list(indent: 1.2em)
-
-#let statement(body) = block(width: 100%, fill: luma(246), inset: 8pt, stroke: 0.6pt + luma(180), radius: 3pt)[
-  #text(weight: "bold")[Exercise statement]
-  #v(4pt)
-  #body
-]
-
-#let sol(body) = block(width: 100%, fill: white, inset: 8pt, stroke: 0.6pt + luma(120), radius: 3pt)[
-  #text(weight: "bold")[Solution]
-  #v(4pt)
-  #body
-]
-
-#let scanref(pages) = text(size: 9pt, fill: luma(90))[Scan pages: #pages]
+#set text(
+  font: ("New Computer Modern", "CMU Serif", "Libertinus Serif", "Times New Roman"),
+  lang: "en",
+)
 
 = Scaling Book Exercises — Chapter 2
 
-#text(weight: "bold")[Chapter:] 2 — How to Think About TPUs\
-#text(weight: "bold")[Source:] handwritten Onyx Boox A4 PDF\
-#text(weight: "bold")[Note:] Transcribed from handwritten solutions; book markdown used only for exercise statements and notation.
+Chapter: 2 — How to Think About TPUs\
+Source: handwritten Onyx Boox A4 PDF\
+Note: Transcribed from handwritten solutions; book markdown used only for exercise statements and notation.
 
-#v(0.7em)
 This document contains only the handwritten solution content from the scan, with exercise statements copied from the Chapter 2 book markdown and kept separate from the solutions.
 
 == Exercise 1 — Bounding LLM latency
 
-#statement[
-Say you want to sample from a 200B parameter model in bf16 that's split across 32 TPU v4p. How long would it take to load all the parameters from HBM into the systolic array? Hint: use the numbers above.
-]
+=== Exercise statement
 
-#sol[
-#scanref[1-2]
+Say you want to sample from a 200B parameter model in bf16 that's split across 32 TPU v4p. How long would it take to load all the parameters from HBM into the systolic array? Hint: use the numbers above.
+
+=== Solution
+
+Scan pages: 1-2
 
 - V4p:
   - HBM BW = $1.2 e 12$
@@ -65,18 +49,18 @@ $
     approx 10 dot 10^(-3) " s"
     = 10 " ms".
 $
-]
 
 == Exercise 2 — TPU details
 
-#statement[
+=== Exercise statement
+
 Consider a full TPU v5e pod. How many total CPU hosts are there? How many TPU TensorCores? What is the total FLOPs/s for the whole pod? What is the total HBM? Do the same exercise for TPU v5p pod.
-]
 
-#sol[
-#scanref[2-5]
+=== Solution
 
-#text(weight: "bold")[TPU v5e pod]
+Scan pages: 2-5
+
+*TPU v5e pod*
 
 - Pod size: $16 times 16$
 - Host size: $4 times 2$
@@ -124,8 +108,7 @@ where 32 is hosts in the pod and 8 is cores per host.
 - Total HBM:
   $256 times 16 dot 10^9 = 4096 e 9 = 4096 " GB".$
 
-#v(0.8em)
-#text(weight: "bold")[TPU v5p pod]
+*TPU v5p pod*
 
 - $16 times 20 times 28$ pod size
 - $2 times 2 times 1$ host size
@@ -156,18 +139,17 @@ $
     approx 41000 times 10^14
     approx 4.1 " Exa FLOPs/s".
 $
-]
 
-#pagebreak()
 
 == Exercise 3 — PCIe operational intensity
 
-#statement[
-Imagine we're forced to store a big weight matrix $A$ of type `bf16[D, F]`, and a batch of activations $x$ of type `bf16[B, D]` in host DRAM and want to do a matrix multiplication on them. This is running on a single host, and we're using a single TPU v6e chip attached to it. You can assume $B << D$, and $F = 4D$. What is the smallest batch size $B$ we need to remain FLOPs bound over PCIe? Assume PCIe bandwidth of `1.6e10` bytes / second.
-]
+=== Exercise statement
 
-#sol[
-#scanref[6-7]
+Imagine we're forced to store a big weight matrix $A$ of type `bf16[D, F]`, and a batch of activations $x$ of type `bf16[B, D]` in host DRAM and want to do a matrix multiplication on them. This is running on a single host, and we're using a single TPU v6e chip attached to it. You can assume $B << D$, and $F = 4D$. What is the smallest batch size $B$ we need to remain FLOPs bound over PCIe? Assume PCIe bandwidth of `1.6e10` bytes / second.
+
+=== Solution
+
+Scan pages: 6-7
 
 ```text
 [Host] -- PCIe --> [TPU]
@@ -196,19 +178,19 @@ $
 $=> B > 5.75 dot 10^4 = 57.5 dot 10^3$
 
 Like 57 sequences of 1024 seq len.
-]
 
 == Exercise 4 — General matmul latency
 
-#statement[
+=== Exercise statement
+
 Let's say we want to multiply a weight matrix `int8[16384, 4096]` by an activation matrix of size `int8[B, 4096]` where $B$ is some unknown batch size. Let's say we're on 1 TPU v5e to start.
 
 1. How long will this multiplication take as a function of $B$? Hint: it may help to calculate how long it will take to load the arrays from HBM and how long the multiplication will actually take. Which is bottlenecking you?
 2. What if we wanted to run this operation out of VMEM? How long would it take as a function of $B$?
-]
 
-#sol[
-#scanref[7-13]
+=== Solution
+
+Scan pages: 7-13
 
 - Use:
   - HBM BW = $8.2 e 11$
@@ -258,8 +240,7 @@ $
     )
 $
 
-#v(0.8em)
-#text(weight: "bold")[Since]
+*Since*
 
 VMEM: $128 " MiB" = 128 dot 10^6$.
 
@@ -269,7 +250,7 @@ At least the weights do fit in VMEM.
 
 - Bottleneck: compute bound when?
 
-#text(size: 9pt)[$
+$
   T_("comms")(B, "BW") <= T_("math")(B)
   => frac(B dot 5 dot D + 4 dot D^2, "BW")
     <= frac(8 dot B dot D^2, 3.94 e 14 " FLOPs/s") \
@@ -285,7 +266,7 @@ At least the weights do fit in VMEM.
   => frac(1, B) <= 2 dot "AI"^(-1) - frac(10, 8 dot D) \
   => B >= frac(1, 2 dot (1 / "AI") - frac(10, 8 dot D))
   => B >= frac(1, 2 dot (frac("BW", 3.94 e 14)) - 3 dot 10^(-4))
-$]
+$
 
 - $"BW"_("HBM") = 8.2 e 11$
 - $"BW"_("VMEM") = 180.4 e 11$
@@ -303,21 +284,20 @@ $
   B >= frac(1, 2 dot frac(180.4 e 11, 3.94 e 14) - 3 dot 10^(-4))
     approx 11.
 $
-]
 
-#pagebreak()
 
 == Exercise 5 — ICI bandwidth
 
-#statement[
+=== Exercise statement
+
 Let's say we have a TPU v5e `4x4` slice. Let's say we want to send an array of type `bf16[8, 128, 8192]` from `TPU{0,0}` to `TPU{3, 3}`. Let's say the per-hop latency for TPU v5e is $1 mu s$.
 
 1. How soon will the first byte arrive at its destination?
 2. How long will the total transfer take?
-]
 
-#sol[
-#scanref[14-17]
+=== Solution
+
+Scan pages: 14-17
 
 4x4 slice, no wraparound.\
 Source = [00] = TPU{0,0}; receiver = [33] = TPU{3,3}.
@@ -366,7 +346,7 @@ And it needs to receive $D$ bytes:
 
 $=> T >= frac(D, 2 dot "BW")$
 
-#text(weight: "bold")[Algo 1]
+*Algo 1*
 
 $frac(2 times 8 times 128 times 8192, 2)$
 
@@ -382,7 +362,7 @@ $
   >= " lower bound"
 $
 
-#text(weight: "bold")[Algo 2]
+*Algo 2*
 
 Everything through path 1:
 
@@ -408,16 +388,16 @@ $
 $
 
 $T_("comms") = 6 mu s + 0.18 " ms".$
-]
 
 == Exercise 6 — Pulling it all together
 
-#statement[
-Imagine you have a big matrix $A$: `int8[128 * 1024, 128 * 1024]` sharded evenly across a TPU v5e 4x4 slice but offloaded to host DRAM on each chip. Let's say you want to copy the entire array to `TPU{0, 0}` and multiply it by a vector `bf16[8, 128 * 1024]`. How long will this take? Hint: use the numbers above.
-]
+=== Exercise statement
 
-#sol[
-#scanref[18-20]
+Imagine you have a big matrix $A$: `int8[128 * 1024, 128 * 1024]` sharded evenly across a TPU v5e 4x4 slice but offloaded to host DRAM on each chip. Let's say you want to copy the entire array to `TPU{0, 0}` and multiply it by a vector `bf16[8, 128 * 1024]`. How long will this take? Hint: use the numbers above.
+
+=== Solution
+
+Scan pages: 18-20
 
 ```text
 Question 6 setup, schematic:
@@ -444,7 +424,7 @@ $=> frac(128^2 dot 1024^2, 2) approx 8.6 " GB"$
 
 per host, so it fits in v5e HBM, which is $16 " GB"$.
 
-#text(weight: "bold")[Path]
+*Path*
 
 ```text
 [Host_B] --PCIe--> [TPU] --ICI--> [TPU[0,0]]
@@ -479,9 +459,7 @@ $
     approx max(0.53 "s", 0.001 "s")
     = 0.53 "s".
 $
-]
 
-#pagebreak()
 
 == Transcription uncertainties
 
