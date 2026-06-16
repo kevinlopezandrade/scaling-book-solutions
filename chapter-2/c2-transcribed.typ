@@ -21,28 +21,22 @@ Say you want to sample from a 200B parameter model in bf16 that's split across 3
 
 Scan pages: 1-2
 
-- V4p:
+v4p $=>$
   - HBM BW = $1.2 e 12$
   - FLOPs/s bf16 = $2.75 e 14$
-  - HBM capacity = $32 " GB"$
+  - HBM capacity = $32 "GB"$
 
-- $200 " Billion" = 200 dot 10^9$ (bf16)
-
-- Split across 32 TPUs, V4p.
-
-- Bytes per TPU:
-
+$200 "Billion" = 200 dot 10^9$ (bf16). Split across 32 TPUs v4p $=>$ Bytes per TPU:
 $
   frac(200 dot 10^9 dot 2, 32)
     = frac(400 dot 10^9, 32)
     = 12.5 dot 10^9 " bytes"
-    = 12.5 " GB"
+    = 12.5 "GB"
 $
 
-$12.5 "GB" <= 32 " GB".$ So it does fit.
+$12.5 "GB" <= 32 "GB".$ So it does fit.
 
-- Each TPU HBM has $12.5 " GB"$ of weights to send to the Tensor Cores:
-
+Each TPU HBM has $12.5 "GB"$ of weights to send to the Tensor Cores:
 $
   T_("comms")
     = frac(12.5 dot 10^9 " bytes", 1.2 e 12 " bytes/s")
@@ -64,12 +58,11 @@ Scan pages: 2-5
 
 - Pod size: $16 times 16$
 - Host size: $4 times 2$
-- HBM per chip: $16 " GB"$
+- HBM per chip: $16 "GB"$
 - FLOPs bf16 per chip = $1.97 e 14$
-
 - Host size: $2 times 4 = 8$
 
-- $16 times 16$: how many blocks of $2 times 4$ fit:
+$16 times 16$: how many blocks of $2 times 4$ fit:
 
 ```text
 One host (schematic):
@@ -80,50 +73,35 @@ One host (schematic):
 +----+----+----+----+
 ```
 
-- 4 hosts to cover one "row".
-- 8 hosts to cover one "column".
-$=> 32 " hosts".$
-
-I could also just flatten:
-
+4 hosts to cover one "row", 8 hosts to cover one "column" $=> 32 " hosts".$ I could also just flatten:
 $16 times 16 = 256$
 
 ```text
 [ ][ ][ ][ ][ ][ ][ ][ ] ...
 <------ 8 ------> is a host
 ```
+and then divide i.e $256/8 = 32$ hosts.
 
-- TPU v5e has only one Tensor Core per chip.
-$=> 256 " Tensor Cores".$
+TPU v5e has only one Tensor Core per chip $=> 256 " Tensor Cores".$ Also you
+can derive by cores per host and from the book you see using previous result:
+$32 times 8 = 256 " Tensor Cores"$ where 32 is hosts in the pod and 8 is cores per host.
 
-- Also you can derive by cores per host and from the book you see using previous result:
+Total FLOPs/s = $256 times 1.97 e 14 approx 500 e 14$
 
-$32 times 8 = 256 " Tensor Cores"$
-
-where 32 is hosts in the pod and 8 is cores per host.
-
-- Total FLOPs/s:
-  $256 times 1.97 e 14 approx 500 e 14$
-
-- Total HBM:
-  $256 times 16 dot 10^9 = 4096 e 9 = 4096 " GB".$
+Total HBM = $256 times 16 dot 10^9 = 4096 e 9 = 4096 " GB".$
 
 *TPU v5p pod*
 
-- $16 times 20 times 28$ pod size
-- $2 times 2 times 1$ host size
+- Pod Size: $16 times 20 times 28$
+- Host Size: $2 times 2 times 1$
 
-- Flatten:
-  $16 times 20 times 28 = 8960 " chips".$
+Flatten $=>$ $16 times 20 times 28 = 8960 " chips".$
 
-- Total hosts:
-  $ frac(8960, 4) = 2240$
+Total Hosts = $ frac(8960, 4) = 2240$
 
-- Tensor Cores:
-  $8960 times 2 = 17920$
+Tensor Cores = $8960 times 2 = 17920$
 
-- Total HBM:
-
+Total HBM:
 $
   8960 times 96 dot 10^9
     = 860160 dot 10^9
@@ -131,13 +109,11 @@ $
     = 860 " TB".
 $
 
-// Uncertainty: the handwritten value below appears to be 4.54e14; transcribed as written.
-- Total FLOPs/s:
-
+Total FLOPs/s:
 $
-  8960 times 4.54 e 14
+  8960 times 4.59 e 14
     approx 41000 times 10^14
-    approx 4.1 " Exa FLOPs/s".
+    approx 4.1 "Exa FLOPs/s".
 $
 
 
@@ -154,17 +130,17 @@ Scan pages: 6-7
 ```text
 [Host] -- PCIe --> [TPU]
 ```
-
+Assume:
 - TPU v6e.
 - $"bf16" [B, D] dot_D "bf16" [D, F] -> "bf16" [B, F]$
 - $B << D$, $F = 4D$.
 - PCIe BW = $1.6 e 10 " bytes/s"$.
 - FLOPs/s = $9.20 e 14$.
-- Assuming I can overlap communication with compute:
 
+Assuming I can overlap communication with compute:
 $
   "AI" := frac(2 dot B D F, 2 B D + 2 D F + 2 B F)
-    > frac(9.20 dot 10^14, 1.6 dot 10^10)
+    >= frac(9.20 dot 10^14, 1.6 dot 10^10)
 $
 
 Using $F = 4D$ and $B << D$:
@@ -175,7 +151,7 @@ $
     = frac(B dot D^2, D^2)
 $
 
-$=> B > 5.75 dot 10^4 = 57.5 dot 10^3$
+$=> B >= 5.75 dot 10^4 = 57.5 dot 10^3$
 
 Like 57 sequences of 1024 seq len.
 
@@ -192,21 +168,17 @@ Let's say we want to multiply a weight matrix `int8[16384, 4096]` by an activati
 
 Scan pages: 7-13
 
-- Use:
+v5e:
   - HBM BW = $8.2 e 11$
   - FLOPs/s int8 = $3.94 e 14$
 
-- VMEM BW $approx$ HBM BW $times 22$:
+VMEM BW $approx$ HBM BW $times 22$ $approx 8.2 dot 10^11 times 22 = 180.4 times 10^11 " bytes/s".$
 
-$approx 8.2 dot 10^11 times 22 = 180.4 times 10^11 " bytes/s".$
+$"int8" [B, 4096] dot "int8" [4096, 16384] -> "int8" [B, 16384]$
 
-- $"int8" [B, 4096]$ at $"int8" [4096, 16384] -> "int8" [B, 16384]$
+$T = max(T_("comms"), T_("math"))$
 
-- $T = max(T_("comms"), T_("math"))$
-
-- Note: $16384 = 4 dot 4096$, so let $D = 4096$ and $F = 4096 dot 4$.
-
-$=> F = 4 dot D$ as before.
+Note: $16384 = 4 dot 4096$, so let $D = 4096$ and $F = 4096 dot 4 => F = 4 dot D$ as before.
 
 $[B, D] dot [D, 4D] -> [B, 4D]$
 
@@ -240,16 +212,11 @@ $
     )
 $
 
-*Since*
+Since: VMEM = $128 " MiB" = 128 dot 10^6$.
 
-VMEM: $128 " MiB" = 128 dot 10^6$.
+$4096 times (4 dot 4096) approx 68 dot 10^6$. At least the weights do fit in VMEM.
 
-$4096 times (4 dot 4096) approx 68 dot 10^6$
-
-At least the weights do fit in VMEM.
-
-- Bottleneck: compute bound when?
-
+Bottleneck: compute bound when?
 $
   T_("comms")(B, "BW") <= T_("math")(B)
   => frac(B dot 5 dot D + 4 dot D^2, "BW")
@@ -268,18 +235,16 @@ $
   => B >= frac(1, 2 dot (frac("BW", 3.94 e 14)) - 3 dot 10^(-4))
 $
 
-- $"BW"_("HBM") = 8.2 e 11$
-- $"BW"_("VMEM") = 180.4 e 11$
-
+$"BW"_("HBM") = 8.2 e 11$
 $
-  => B
-    >= frac(1, 2 dot frac(8.2 e 11, 3.94 e 14) - 3 dot 10^(-4))
+  B >= frac(1, 2 dot frac(8.2 e 11, 3.94 e 14) - 3 dot 10^(-4))
     approx frac(1, 4 dot 10^(-3))
     = (4 dot 10^(-3))^(-1)
     = frac(1, 4) dot 10^3
     = 250
 $
 
+$"BW"_("VMEM") = 180.4 e 11$
 $
   B >= frac(1, 2 dot frac(180.4 e 11, 3.94 e 14) - 3 dot 10^(-4))
     approx 11.
@@ -320,35 +285,34 @@ P2: down the left column, then across the bottom row.
   v                                v
 [30]--P2-->[31]--P2-->[32]--P2-->[33]
 ```
+v5e $=> (4,4)$ slice has no wraparound.
 
-- Use $=> (4,4)$ slice has no wraparound.
-
-- Assume $T_("comms, hop") = alpha + frac(D, "BW")$ for one hop.
-
+Assume $T_("comms, hop") = alpha + frac(D, "BW")$ for one hop.
 Then, assuming pipelining:
 
 $
   T_("comms") = "#Hops" dot alpha + frac(D, "BW")
-  quad alpha = 1 mu s
+  quad "where" alpha = 1 mu s
 $
+$"#Hops" = 6 =>$ first byte arrives after $6 mu s$.
 
-- $"#Hops" = 6 =>$ first byte arrives after $6 mu s$.
-
-- Different algos, but a lower bound on time is:
-
+Different algos, but a lower bound on time is:
+$
+  T >= frac(D, 2 dot "BW")
+$
+since it needs to receive $D$ bytes at $2*"BW"$:
 ```text
-      --> [receiver]
-      -->
-        at 2*BW
+           |
+           |
+           v
+----> [TPU[3, 3]]
 ```
 
-And it needs to receive $D$ bytes:
 
-$=> T >= frac(D, 2 dot "BW")$
 
 *Algo 1*
 
-$frac(2 times 8 times 128 times 8192, 2)$
+Data Split = $frac(2 times 8 times 128 times 8192, 2)$
 
 path1 = P1 arrows: [00] -> [01] -> [02] -> [03] -> [13] -> [23] -> [33]\
 path2 = P2 arrows: [00] -> [10] -> [20] -> [30] -> [31] -> [32] -> [33]
@@ -372,8 +336,7 @@ $
     > " lower bound"
 $
 
-- BW = $4.5 e 10$.
-
+BW = $4.5 e 10$. Therefore:
 $
   frac(D, 2)
     = frac(2 times 8 times 128 times 8192, 2)
@@ -404,7 +367,7 @@ Question 6 setup, schematic:
 
 Host 0 (4x2)             Host 1 (4x2)
 +----+----+              +----+----+
-|    |----|--------------|    |    |      No wraparound links
+|    |----|--------------|    |    |
 +----+----+              +----+----+
 |    |    |              |    |    |
 +----+----+              +----+----+
@@ -414,14 +377,9 @@ Host 0 (4x2)             Host 1 (4x2)
 +----+----+              +----+----+
 ```
 
-- No wraparound links.
+No wraparound links.
 
-- $"int8" A[128 dot 1024, 128 dot 1024]$
-
-- Assume each host DRAM has an even part of the array $A$:
-
-$=> frac(128^2 dot 1024^2, 2) approx 8.6 " GB"$
-
+$"int8" A[128 dot 1024, 128 dot 1024]$. Assume each host DRAM has an even part of the array $A => frac(128^2 dot 1024^2, 2) approx 8.6 " GB"$
 per host, so it fits in v5e HBM, which is $16 " GB"$.
 
 *Path*
@@ -432,26 +390,20 @@ per host, so it fits in v5e HBM, which is $16 " GB"$.
 [Host_A] --PCIe--> [TPU[0,0]]
 ```
 
-- Assuming pipelining:
-
+Assuming pipelining:
 $
   T_("comms")(A)
-    := frac(8.6 " GB", "BW"_("PCIe"))
+    := frac(8.6 "GB", "BW"_("PCIe"))
     = frac(8.6 dot 10^9, 1.6 dot 10^10)
-    approx 5.3 dot 10^(-1) " s"
+    approx 5.3 dot 10^(-1) "s"
     = 0.53 " s"
 $
 
-$"bf16" [8, 128 times 1024]$
-
-- $8 times 128 times 1024 times 2 approx 2 " GB"$
-
-- so let's assume it's in HBM already.
-
-- Assuming intended operation is:
-
-$[128 times 1024, 128 times 1024] @ [128 times 1024, 8]$
-
+$"Bytes in" "bf16"[8, 128 times 1024] = 8 times 128 times 1024 times 2 approx 2 "GB"$. So let's assume it's in HBM already.
+Assuming intended operation is:
+$
+[128 times 1024, 128 times 1024] @ [128 times 1024, 8]
+$
 $
   => T
     = max(T_("comms"), T_("math"))
@@ -459,14 +411,3 @@ $
     approx max(0.53 "s", 0.001 "s")
     = 0.53 "s".
 $
-
-
-== Transcription uncertainties
-
-- Page 3 and page 18 topology drawings were converted to schematic ASCII diagrams rather than exact drawings.
-- Page 5's TPU v5p per-chip FLOPs/s value appears to be $4.54 e 14$ in the handwriting; it is transcribed that way without correction.
-- Page 7's sentence about "57 sequences of 1024 seq len" is transcribed as read from the handwriting.
-- Page 20's activation-size line appears to say $2 " GB"$; it is transcribed as written and not corrected.
-- Page 20's intended matmul shape was partly ambiguous; it is transcribed as $[128 times 1024, 128 times 1024] @ [128 times 1024, 8]$.
-
-// End of transcription. Page 21 of the input scan was blank.
