@@ -119,7 +119,7 @@ The two cases are
 $D = F = 4096 quad | quad F = D = 1024.$
 
 The handwritten line for achievable FLOPs/s is written as
-$ "Achievable FLOPs/s" = max( frac(2 dot B D F, 2 dot B D + D F + 2 dot B F) dot "BW", 1.97 times 10^14 ). $
+$ "Achievable FLOPs/s" = min( frac(2 dot B D F, 2 dot B D + D F + 2 dot B F) dot "BW", 1.97 times 10^14 ). $
 
 Assuming $D = F$:
 $ frac(2 dot B dot D^2, 2 dot B dot D + D^2 + 2 dot B dot D)
