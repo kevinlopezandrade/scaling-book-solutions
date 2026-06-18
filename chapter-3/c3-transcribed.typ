@@ -23,39 +23,33 @@ An array is sharded $A[I_X, J, K, ...]$ (i.e., only sharded across $X$), with a 
 
 Scan pages: 1-2.
 
-$ A[I_X, J, K, ...] $
-
-$ "Mesh" = {X: 4, Y: 8, Z: 2} $
+Let $A[I_X, J, K, ...]$ and $"Mesh" = {X:4, Y:8, Z:2}$.
 
 At each device tuple $(i, j, k)$, size of array shard is:
+$
+  "Size of shard" = frac(abs(I), X) dot P dot "BytesForPrecision" "where" P = product_(d in "dimensions" - {I}) abs(d)
+$
 
-$
-  P = product_(d in "dimensions" / {I}) abs(d)
-$
-
-$
-  "Size of shard" = frac(abs(I), X) dot P dot "bytes for precision"
-$
 
 Assuming "one copy of array" means unsharded array, ratio is then:
 
 $
-  frac(X dot Y dot Z dot abs(I) dot X^(-1) dot P dot "bytes for precision",
-       abs(I) dot P dot "bytes for precision") = 16
+  frac(X dot Y dot Z dot abs(I) dot X^(-1) dot P dot "BytesForPrecision",
+       abs(I) dot P dot "BytesForPrecision") = 16
 $
 
 If copy means one shard, then ratio is:
 
 $
-  frac(X dot Y dot Z dot abs(I) dot X^(-1) dot P dot "bytes for precision",
-       abs(I) dot X^(-1) dot P dot "bytes for precision") = 64
+  frac(X dot Y dot Z dot abs(I) dot X^(-1) dot P dot "BytesForPrecision",
+       abs(I) dot X^(-1) dot P dot "BytesForPrecision") = 64
 $
 
 == Exercise 2 -- AllGather latency
 
 === Exercise statement
 
-How long should $"AllGather"_X([B_X, D_Y])$ take on a TPU v4p 4x4x4 slice with mesh `Mesh({'X': 4, 'Y': 4, 'Z': 4})` if $B=1024$ and $D=4096$ in bfloat16? How about $"AllGather"_(X Y)([B_X, D_Y])$? How about $"AllReduce"_Z([B_X, D_Y] {U_Z})$?
+How long should $"AllGather"_(X)([B_X, D_Y])$ take on a TPU v4p 4x4x4 slice with mesh `Mesh({'X': 4, 'Y': 4, 'Z': 4})` if $B=1024$ and $D=4096$ in bfloat16? How about $"AllGather"_(X Y)([B_X, D_Y])$? How about $"AllReduce"_(Z)([B_X, D_Y] {U_Z})$?
 
 === Solution
 
@@ -68,12 +62,7 @@ $"v4p":$
 - FLOPs/s (bf16) = $2.75 e 14$
 - ICI Bidi = $9.0 e 10$
 
-Slice of $4 times 4 times 4$ $"v4p"$.
-
-$"Mesh" = {X: 4, Y: 4, Z: 4}$
-
-Let $B = 1024$ and $D = 4096$ in bfloat16.
-
+Slice of $4 times 4 times 4$ $"v4p"$. $"Mesh" = {X: 4, Y: 4, Z: 4}$. Let $B = 1024$ and $D = 4096$ in bfloat16.
 Assuming $A[B_X, D_Y]$, each device tuple in the mesh maps to:
 
 $
@@ -84,7 +73,6 @@ $
 $
 
 Therefore size per shard is:
-
 $
   frac(abs(B), X) dot frac(abs(D), Y) dot 2 = frac(B^2, 2) "bytes"
 $
@@ -92,43 +80,30 @@ $
 since $D = 4 dot B$.
 
 Since v4p slice $4 times 4 times 4$ has wrap-around links, we get that:
-
 $
-  T("AllGather"_X([B_X, D_Y]))
+  T("AllGather"_(X)([B_X, D_Y]))
     = frac(X, 2) dot frac(B^2, 2 dot W_("uni"))
     = frac(B^2, 4.5 e 10)
     approx 2 dot 10^(-5) "s"
-    = 0.02 "ms"
+    = 0.02 "ms."
 $
 
 For allgather on 2 axis we don't have an specific algorithm but we can derive a lower bound:
-
 $
   T("AllGather"_(X Y)([B_X, D_Y]))
     >= frac(2 dot B dot D, 2 dot W_("ICI"))
     = frac(2 B dot 4 B, 2 W_("ICI"))
     = frac(4 B^2, 9 e 10)
-    approx 0.04 "ms"
+    approx 0.04 "ms."
 $
 
-$T("AllReduce"_Z([B_X, D_Y] {U_Z}))$
-
-$
-  = frac(Z, 2) dot (frac(B^2, 2 dot Z dot W_("uni")))
-    + frac(Z, 2) dot (frac(B^2, 2 dot Z dot W_("uni")))
-$
-
-$
-  = frac(B^2, 4 dot W_("uni")) + frac(B^2, 4 dot W_("uni"))
+$T("AllReduce"_(Z)([B_X, D_Y] {U_Z})) = frac(Z, 2) dot (frac(B^2, 2 dot Z dot W_("uni"))) + frac(Z, 2) dot (frac(B^2, 2 dot Z dot W_("uni"))) = frac(B^2, 4 dot W_("uni")) + frac(B^2, 4 dot W_("uni"))
   = frac(2 B^2, 4 W_("uni"))
   = frac(B^2, 2 W_("uni"))
   = frac(B^2, W_("ICI"))
-$
-
-$
   = frac(1024^2, 9 e 10)
   = 1 dot 10^(-4)
-  = 0.01 "ms"
+  = 0.01 "ms."
 $
 
 == Exercise 3 -- latency-bound AllGather
@@ -143,39 +118,18 @@ Scan pages: 6-7.
 
 TPU v4p.
 
-Let:
+Let $"Mesh" = {X: 4, Y: 4, Z: 4}$
+Let $B = 128 "and" A = "bfloat16"[B_X]$
 
-$
-  "Mesh" = {X: 4, Y: 4, Z: 4},
-  quad B = 128,
-  quad A = "bfloat16"[B_X]
-$
-
-Assuming communication model:
-
-$
-  T_("step") = alpha + frac(D, "BW")
-$
-
-where $alpha = 1 mu "s"$, and wraparound links.
-
-$
-  T("AllGather"_X([B_X]))
-    = frac(X, 2) dot (alpha + frac(B dot 2, X dot W_("uni")))
-$
-
-$
+Assuming communication model $T_("step") = alpha + frac(D, "BW")$
+where $alpha = 1 mu "s"$, and wraparound links,
+$T("AllGather"_(X)([B_X]))
+  = frac(X, 2) dot (alpha + frac(B dot 2, X dot W_("uni")))
   = 2 dot alpha + frac(2 dot B, W_("ICI"))
-  = 2 mu "s" + frac(256, 9 e 10)
-$
-
-$
-  approx 2 mu "s" + 28.5 dot 10^(-10)
-  = 2 mu "s" + 28.5 dot 10^(-3) dot 10^(-6)
-$
-
-$
-  = 2 mu "s" + 0.0285 mu "s"
+  = 2 mu"s" + frac(256, 9 e 10)
+  approx 2 mu"s" + 28.5 dot 10^(-10)
+  = 2 mu"s" + 28.5 dot 10^(-3) dot 10^(-6)
+  = 2 mu"s" + 0.0285 mu"s"
 $
 
 So yeah I'm bound by latency.
@@ -184,7 +138,12 @@ So yeah I'm bound by latency.
 
 === Exercise statement
 
-To perform $X[B, D] dot_D Y[D_X, F] -> Z[B, F]$, in this section we tell you to perform $"AllGather"_X(Y[D_X, F])$ and multiply the fully replicated matrices (Case 2, Strategy 1). Instead, you could multiply the local shards like $X[B, D_X] dot_D Y[D_X, F] -> Z[B, F] {U_X}$ (Case 3, Strategy 2), and then $"AllReduce"_X(Z[B, F] {U_X})$. How many FLOPs and comms does each of these perform? Which is better and why?
+To perform $X[B, D] dot_D Y[D_X, F] -> Z[B, F]$, in this section we tell you to
+perform $"AllGather"_(X)(Y[D_X, F])$ and multiply the fully replicated matrices
+(Case 2, Strategy 1). Instead, you could multiply the local shards like $X[B,
+D_X] dot_D Y[D_X, F] -> Z[B, F] {U_X}$ (Case 3, Strategy 2), and then
+$"AllReduce"_(X)(Z[B, F] {U_X})$. How many FLOPs and comms does each of these
+perform? Which is better and why?
 
 === Solution
 
@@ -194,205 +153,92 @@ $ X[B,D] dot_D Y[D_X,F] -> Z[B,F] $
 
 _Strategy 1:_
 
-1. $"AllGather"_X(Y[D_X,F]) -> Y[D,F]$
+1. $"AllGather"_(X)(Y[D_X,F]) -> Y[D,F]$
 2. $X[B,D] dot_D Y[D,F] -> Z[B,F]$
 
-Note that $2 dot X =$ number of directed links. Each link participates in $X / 2$ steps of the bidirectional ring algo and each payload is:
-
+Note that $2 dot X =$ number of directed links. Each link participates in $X / 2$ steps of the bidirectional ring algo and each payload is
+$frac(D dot F dot 2, X)$, assuming bfloat16:
 $
-  frac(D dot F dot 2, X)
-$
-
-assuming bfloat16.
-
-$
-  "AllGather"[D_X,F] " comms"
+  "AllGather"[D_X,F] "Comms"
     = 2 dot (frac(X,2) dot frac(D dot F dot 2, X))
     = 2 D F
 $
 
-Comms for MatMul:
+Comms for MatMul $= 2 B D + 2 D F + 2 B F$
+$=> "Total comms strategy 1" = 2D F + 2 B D + 2 D F + 2 B F = 4 D F + 2 B D + 2 B F.$
 
-$
-  2 B D + 2 D F + 2 B F
-$
-
-Total comms strategy 1:
-
-$
-  = 2D F + 2 B D + 2 D F + 2 B F
-  = 4 D F + 2 B D + 2 B F
-$
-
-FLOPs for strategy 1:
-
-$
-  = 2 dot B dot D dot F
-$
+$"FLOPs for strategy 1" = 2 dot B dot D dot F$
 
 _Strategy 2:_
 
 1. $X[B,D_X] dot_D Y[D_X,F] -> Z[B,F] {U_X}$
-2. $"AllReduce"_X(Z[B,F] {U_X})$
+2. $"AllReduce"_(X)(Z[B,F] {U_X})$
 
-Comms MatMul:
+$"Comms MatMul" = 2 dot B dot frac(D, X) + 2 dot frac(D, X) dot F + 2 dot B dot F.$
 
-$
-  = 2 dot B dot frac(D, X) + 2 dot frac(D, X) dot F + 2 dot B dot F
-$
+$"Comms" "AllReduce"_(X)(Z[B,F] {U_X}) = 2 dot (2 (frac(X,2) dot frac(B dot F dot 2, X))) = 4 B F.$
 
-Comms $"AllReduce"_X(Z[B,F] {U_X})$:
+$"Total comms strategy 2" = 4 B F + 2 dot B dot frac(D, X) + 2 dot frac(D, X) dot F + 2 B F = 6 B F + 2 dot B dot frac(D, X) + 2 dot frac(D, X) dot F.$
 
-$
-  approx 2 dot (2 (frac(X,2) dot frac(B dot F dot 2, X))) = 4 B F
-$
-
-Total comms strategy 2:
-
-$
-  = 4 B F + 2 dot B dot frac(D, X) + 2 dot frac(D, X) dot F + 2 B F
-$
-
-$
-  = 6 B F + 2 dot B dot frac(D, X) + 2 dot frac(D, X) dot F
-$
-
-FLOPs strategy 2:
-
-$
-  = 2 dot B dot frac(D, X) dot F
-$
+$"FLOPs strategy 2" = 2 dot B dot frac(D, X) dot F.$
 
 From the book they say you can overlap collective communications with the matrix multiplication itself. So then we can work only with the communications of the collectives to see which strategy is better.
 
 So then assume:
-
 $
-  T_("strategy1") = max(frac(2 D F, W_("ICI")), frac(2 B D F, "FLOPs/s"))
-$
-
-$
-  T_("strategy2") = max(frac(4 B F, W_("ICI")), frac(2 B D F, X dot "FLOPs/s"))
-$
-
-$
-  A I_1 = frac(2 B D F, 2 D F) = B quad "FLOPs/Byte"
-$
-
-$
-  A I_2 = frac(2 B D F dot X^(-1), 4 B F)
-    = frac(D, 2X) quad "FLOPs/Byte"
+  T_("strategy1") &= max(frac(2 D F, W_("ICI")), frac(2 B D F, "FLOPs/s")) \ 
+  T_("strategy2") &= max(frac(4 B F, W_("ICI")), frac(2 B D F, X dot "FLOPs/s")) \
+  A I_1 &= frac(2 B D F, 2 D F) = B quad "FLOPs/Byte" \ 
+  A I_2 &= frac(2 B D F dot X^(-1), 4 B F) = frac(D, 2X) quad "FLOPs/Byte"
 $
 
 Let's fix $X in {4, 8, 16}$ valid in v4p slice, and they will still have a wraparound link.
-
-$
-  A I_1(B),
-  quad A I_2(D; X) quad "for fixed values of" X
-$
+$A I_1(B),quad A I_2(D; X) "for fixed values of" X.$
 
 Achievable FLOPs:
 
 $
-  "Achievable FLOPs"(B) = min(B dot 9 e 10, 2.75 e 14)
+  "Achievable FLOPs"(B) &= min(B dot 9 e 10, 2.75 e 14) \
+  "Achievable FLOPs"(D; X) &= min(frac(D, 2 X) dot 9 e 10, 2.75 e 14)
 $
 
-$
-  "Achievable FLOPs"(D; X) = min(frac(D, 2 X) dot 9 e 10, 2.75 e 14)
-$
+#image("plot.png")
 
-```text
-Achievable FLOPs
-  ^
-3e14 |             ---------------------  min(B*9e10, 2.75e14)
-     |            / . . . . . . . . . .   min(D/(2X)*9e10, 2.75e14)
-     |           /
-     |          /
-     +----|----|------------------------> B or D
-         3k   24k
-```
-
-Algo 1: branches by $B > 3055$.
-
-Algo 2: branches by $D > 24 K$.
-
+Algo 1 branches by $B > 3055$.Algo 2 branches by $D > 24 K$.
 So in total 4 combinations:
 
-$B > 3055$ and $D > 24 K$ $=>$ both algos are compute bound.
-
-When:
-
+$B > 3055$ and $D > 24 K$ $=>$ Both algos are compute bound.
 $
-  T_("math")("Strat 1") < T_("math")("Strat 2")
-  <=> 2 B D F < frac(2 B D F, X) quad "for" X = 4
+  &T_("math")("Strat 1") < T_("math")("Strat 2") \
+  &<=> 2 B D F < frac(2 B D F, X) quad "for" X = 4 \
+  &<=> 2 < frac(1, 2) quad "Contradiction."
 $
-
-$
-  <=> 2 < frac(1, 2) quad "Contradiction."
-$
-
-Therefore $T_("math")("Strat 2")$ beats $T_("math")("Strat 1")$ [comparison mark in handwriting uncertain], and in fact it holds for every $X > 1$; just the condition for when Algo 2 is compute bound changes, but assuming both compute bound strategy 2 is better.
+Therefore $T_("math")("Strat 2") >= T_("math")("Strat 1")$ and in fact it holds for every $X > 1$. Just the condition for when Algo 2 is compute bound changes, but assuming both compute bound strategy 2 is better.
 
 $B > 3055$ and $D < 24 K$ $=>$ Algo 1 compute bound and Algo 2 communication bound.
-
-When:
-
 $
-  T_("math")("Strat 1") < T_("comms")("Strat 2")
+  &T_("math")("Strat 1") < T_("comms")("Strat 2") \
+  &<=> frac(2 B D F, "FLOPs/s") < frac(4 B F, W_("ICI")) \
+  &<=> frac(2D, 4) < frac("FLOPs", W_("ICI")) = 3055 \
+  &<=> frac(D, 2) < 3055 => D < 6110
 $
-
-$
-  <=> frac(2 B D F, "FLOPs/s") < frac(4 B F, W_("ICI"))
-$
-
-$
-  <=> frac(2D, 4) < frac("FLOPs", W_("ICI")) = 3055
-$
-
-$
-  <=> frac(D, 2) < 3055 => D < 6110
-$
-
-So strategy 1 in this case wins for $D < 6110$; otherwise strategy 2 is better.
+So strategy 1 in this case wins for $D < 6110$ otherwise strategy 2 is better.
 
 $B < 3055$ and $D > 24 K$ $=>$ Algo 1 communication bound and Algo 2 compute bound.
-
-When:
-
 $
-  T_("comms")("Strat 1") < T_("math")("Strat 2")
+  &T_("comms")("Strat 1") < T_("math")("Strat 2") \
+  &<=> frac(2 D F, W_("ICI")) < frac(2 B D F, X dot "FLOPs/s")) quad "for" X = 4 \
+  &<=> frac(2, W_("ICI")) < frac(2 B, 4 dot "FLOPs/s") \
+  &<=> B > 4 dot frac("FLOPs/s", W_("ICI")) = 4 dot 3055 approx 12 K
 $
-
-$
-  <=> frac(2 D F, W_("ICI")) < frac(2 B D F, X dot "FLOPs/s")) quad "for" X = 4
-$
-
-$
-  <=> frac(2, W_("ICI")) < frac(2 B, 4 dot "FLOPs/s")
-$
-
-$
-  <=> B > 4 dot frac("FLOPs/s", W_("ICI")) = 4 dot 3055 approx 12 K
-$
-
 which is a contradiction, so then strategy 2 in this setting is always better, and in fact it will hold for all $X > 2$. It just changes the condition when algo 2 is compute bound.
 
-$B <= 3055$ and $D <= 24 K$ $=>$ both algos are communication bound.
-
-When:
-
+$B <= 3055$ and $D <= 24 K$ $=>$ Both algos are communication bound.
 $
-  T_("comms")("Strat 1") < T_("comms")("Strat 2")
+  &T_("comms")("Strat 1") < T_("comms")("Strat 2") \
+  &<=> 2 D F < 4 B F \
+  &<=> 2D < 4B => D < 2 dot B
 $
-
-$
-  <=> 2 D F < 4 B F
-$
-
-$
-  <=> 2D < 4B => D < 2 dot B
-$
-
 So if $D < 2 dot B$, strategy 1 wins, otherwise strategy 2 wins. In the book they often assume $D >> B$, so then $D > 2 dot B$ and strategy 2 is better.
 
 == Exercise 5 -- minimum latency
