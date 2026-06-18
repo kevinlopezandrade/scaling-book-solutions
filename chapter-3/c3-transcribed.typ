@@ -663,9 +663,3 @@ $
   frac("Scalars"("Bidi AllToAll"), "Scalars"("Bidi AllGather"))
   = frac(N^2, 8) dot frac(2, N^2) = frac(2, 8) = frac(1, 4)
 $
-
-== Transcription uncertainties
-
-- Exercise 4, page 13: the handwritten comparison mark after $T_("math")("Strat 2")$ is not perfectly clear; the accompanying sentence says strategy 2 is better when both are compute bound.
-- Exercise 5, pages 20-25: several handwritten sharding labels and one tensor-like label near "will not fit in HBM" are difficult to read and are marked inline.
-- Exercise 10, page 40: only the final ratio was written on the page; the surrounding interpretation is minimal in the handwriting.
