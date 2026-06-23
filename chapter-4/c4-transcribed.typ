@@ -25,31 +25,31 @@ Scan pages: 1--2
 
 The total parameters of a model are:
 $
-  (3 D F + 4 D N H + D) dot L + D dot V.
+  (3 D F + 4 D N H + D) L + D V.
 $
 
-If we assume $F = 4 dot D$, $N dot H = D$, we get:
+If we assume $F = 4D$, $N H = D$, we get:
 $
-  (16 D^2 + D) dot L + D dot V.
+  (16 D^2 + D) L + D V.
 $
 
 Let $D = 4096$, $V = 32000$, $L = 64$. Hence:
 $
   (16 dot (4096)^2 + 4096) dot 64 + 4096 dot 32000
     approx 17.3 dot 10^9
-    = 17.3 "billion parameters".
+    = 17.3 "Billion parameters".
 $
 
-Attention params are $4 D^2 dot L$ hence:
+Attention params are $4 D^2 L$ hence:
 $
-  4 dot (4096)^2 dot 64 approx 4.3 "billion",
+  4 dot (4096)^2 dot 64 approx 4.3 "Billion",
 $
 so the fraction is:
 $
   frac(4.3, 17.3) approx 0.24.
 $
 
-The size of the KV cache is $2 dot S dot L dot N dot H$ and since $N dot H = D$, we get $2 dot L dot D$ per token, i.e.
+The size of the KV cache is $2 dot S dot L dot N dot H$ and since $N H = D$, we get $2 dot L dot D$ per token i.e.
 $
   2 dot 64 dot 4096 approx 524 "KB".
 $
@@ -73,7 +73,7 @@ $
 FLOPs. Hence total FLOPs is:
 $
   "Total FLOPs"
-    = |X| dot |Y| dot |Z| dot 2 dot frac(B, |X|) dot frac(D, |Y|) dot F \
+    = |X| dot |Y| dot |Z| dot 2 dot frac(B, |X|) dot frac(D, |Y|) dot F
     = 8 B D F.
 $
 
@@ -94,13 +94,9 @@ $
 by means of:
 $
   C[K,L,M,N,O]
-    = sum_(j=1)^J sum_(i=1)^I A[i,j,k,l] dot B[i,j,m,n,o].
+    = sum_(j=1)^J sum_(i=1)^I A[i,j,K,L] dot B[i,j,M,N,O].
 $
-
-We do:
-$
-  K dot L dot M dot N dot O dot 2 dot I dot J.
-$
+we do $K dot L dot M dot N dot O dot 2 dot I dot J$ FLOPs.
 
 == Exercise 4 -- Self-attention arithmetic intensity and effective cost
 
@@ -115,43 +111,40 @@ Scan pages: 4--8
 Assume our naive attention algorithm writes every intermediate result back to HBM and also that $K = N$. Hence we do:
 
 1. $L[B,T,S,N] <- Q[B,T,N,H] dot K[B,S,N,H]$.
-2. $S[B,T,S,N] <- ("SoftMax"_S)(L[B,T,S,N])$.
+2. $S[B,T,S,N] <- "SoftMax"_(S)(L[B,T,S,N])$.
 3. $O[B,T,N,H] <- S[B,T,S,N] dot V[B,S,N,H]$.
 
-Assume that $N dot H = D$.
+Assume that $N H = D$.
 
 Step 1:
 $
-  "Bytes step 1" = 2 B T N H + 2 B S N H + 2 B T S N
+  "Bytes Step 1" = 2 B T N H + 2 B S N H + 2 B T S N
     = 2 B T D + 2 B S D + 2 B T S N, \
-  "FLOPs step 1" = 2 B N T S H = 2 B T S D.
+  "FLOPs Step 1" = 2 B N T S H = 2 B T S D.
 $
 
 Step 2:
 $
-  "Bytes step 2" = 2 B T S N + 2 B T S N = 4 B T S N, \
-  "FLOPs step 2" = O(B T S N).
+  "Bytes Step 2" = 2 B T S N + 2 B T S N = 4 B T S N, \
+  "FLOPs Step 2" = O(B T S N).
 $
 
 Step 3:
 $
-  "Bytes step 3" = 2 B T S N + 2 B S N H + 2 B T N H
+  "Bytes Step 3" = 2 B T S N + 2 B S N H + 2 B T N H
     = 2 B T S N + 2 B S D + 2 B T D, \
-  "FLOPs step 3" = 2 B N T H S = 2 B T S D.
+  "FLOPs Step 3" = 2 B N T H S = 2 B T S D.
 $
 
 Assume Flash Attention, so $L[B,T,S,N]$ does not need to be in HBM.
 
 $
-  "Bytes total" = 4 dot (B S D + B T D), \
-  "FLOPs total" = 2 B T S D + 2 B T S D = 4 B T S D.
-$
-
-$
+  "Bytes Total" &= 4 (B S D + B T D) \
+  "FLOPs Total" &= 2 B T S D + 2 B T S D = 4 B T S D \
   "AI"(T,S)
-    = frac(B T S D, B S D + B T D)
+    &= frac(B T S D, B S D + B T D)
     = frac(T S D, S D + T D)
-    approx frac(T S, T + S).
+    = frac(T S, T + S).
 $
 
 Let $S = T$:
@@ -159,7 +152,7 @@ $
   "AI" = frac(T^2, 2 T) = frac(T, 2).
 $
 
-If $T >> 2 dot "AI"("accelerator")$, we are FLOPs bound. If we assume v5e, then $"AI"("v5e") approx 240$, hence $T >> 480$.
+If $T >= 2 dot "AI"("accelerator")$, we are FLOPs bound. If we assume v5e, then $"AI"("v5e") approx 240$, hence $T >= 480$.
 
 If by effective relative cost they mean:
 $
@@ -169,20 +162,17 @@ where $T$ is context length, not time.
 
 Assume $B > 240$ so that in the FFW block we become compute bound, hence:
 $
-  t_("FFW") = frac(6 B T D F, "FLOPs/s").
-$
-
-$
+  t_("FFW") = frac(6 B T D F, "FLOPs/s") \
   t_("attention") = max(frac(8 B T D, "BW"), frac(4 B T^2 D, "FLOPs/s"))
 $
-
+Therefore:
 $
   "Effective cost"(T)
-    = frac(max(frac(8 B T D, "BW"), frac(4 B T^2 D, "FLOPs/s")), frac(6 B T D F, "FLOPs/s")) \
+    = frac(max(frac(8 B T D, "BW"), frac(4 B T^2 D, "FLOPs/s")), frac(6 B T D F, "FLOPs/s"))
     = max(frac(8 B T D, "BW"), frac(4 B T^2 D, "FLOPs/s")) dot frac("FLOPs/s", 6 B T D F).
 $
 
-If $T > 480$, then:
+If $T >= 480$, then:
 $
   "Effective cost"(T)
     = frac(4 B T^2 D, 6 B T D F)
@@ -194,17 +184,18 @@ $
 If $T < 480$, then:
 $
   "Effective cost"(T)
-    = frac(8 B T D, "BW") dot frac("FLOPs/s", 6 B T D F) \
+    = frac(8 B T D, "BW") dot frac("FLOPs/s", 6 B T D F)
     = frac(8 B T D, 6 B T D F) dot frac(1, 240)
-    = frac(8, 24 D) dot frac(1, 240) \
+    = frac(8, 24 D) dot frac(1, 240)
     = frac(8, 24 dot 240 dot D)
     = frac(8, 5760 dot D)
-    approx ["unclear"] dot frac(1, D).
+    approx frac(13, 10^(-4)) dot frac(1, D).
 $
 
-Assume $D approx 8k$.
+Assume $D approx 8k$:
 
-Plot generated from the formulas above with $D approx 8k$.
+#image("effective-cost-plot.png", width: 80%)
+
 
 == Exercise 5 -- Attention FLOPs vs. QKVO projection FLOPs
 
@@ -216,10 +207,10 @@ At what sequence length are self-attention FLOPs equal to the QKVO projection FL
 
 Scan pages: 9
 
-Assuming FLOPs without training, $D = N dot H$, $S = T$, and $N = K$, then we have to solve for:
+Assuming FLOPs without training, $D = N H$, $S = T$, and $N = K$. Then we have to solve for:
 $
-  4 B T^2 D = 8 B T D N H \
-  => 4 B T^2 D = 8 B T D^2 \
+  4 B T^2 D = 8 B T D N H
+  => 4 B T^2 D = 8 B T D^2
   => T = frac(8, 4) D => T = 2D.
 $
 
@@ -242,44 +233,20 @@ $
 
 In a computational graph, during the backward pass, it will receive $frac(d L, d O)$, and it will compute $frac(d L, d I)$, $frac(d L, d W)$ and send $frac(d L, d I)$ down the graph. Note that in general:
 $
-  frac(d L, d W) = frac(d L, d O) dot frac(d O, d W)(W, I),
+  frac(d L, d W) = frac(d L, d O) dot frac(d O, d W)(W, I)
 $
 so it depends on $I$ as well. With this in mind, we can see that if we draw the computational graph we will need to rematerialize:
 
-- $I = "gelu"(X dot W_("in1")) ⊙ (X dot W_("in2"))$ for $frac(d L, d W_("out"))$.
-- $A = "softmax"(Q dot K^T) dot V$ for $frac(d L, d W_o)$.
-- $"softmax"(Q dot K^T)$ for $frac(d L, d V)$.
+- $I = "gelu"(X  W_("in1")) ⊙ (X  W_("in2"))$ for $frac(d L, d W_("out"))$.
+- $A = "softmax"(Q K^T)  V$ for $frac(d L, d W_o)$.
+- $"softmax"(Q K^T)$ for $frac(d L, d V)$.
 
-where we have ignored the layernorm operations.
-
-```text
-Computational graph:
-
-m = saved
-
-                  Out = I · Wout
-                         ↑
-             I = gelu(I1) ⊙ I2
-              ↑                    ↑
-       I1 = O · Win1        I2 = O · Win2
-              \              /
-               \            /
-                 O = A · Wo
-                       ↑
-                    A = S · V
-                   ↑       ↑
-        S = softmax(Q · K^T)   V = X · Wv
-             ↑        ↑
-        Q = X · Wq   K = X · Wk
-              \       |       /
-                       X
-```
-
-Therefore we need:
+where we have ignored the layernorm operations. Therefore we need:
 $
   "FLOPs" = 4 B T S N H + O(B T F)
 $
 to rematerialize during the backward pass.
+#image("computational-graph.png", width: 30%)
 
 == Exercise 7 -- DeepSeek V3 utilization
 
@@ -291,22 +258,16 @@ DeepSeek v3 says it was trained for 2.79M H800 hours on 14.8T tokens. Given that
 
 Scan pages: 12
 
-FLOPs for V3:
-$
-  6 dot 37 e 9 dot 14.8 e 12.
-$
+FLOPs for V3 = $6 dot 37 e 9 dot 14.8 e 12$.
 
-$"H800 SXM FP8 tensor core FLOPs/s" = 1474 "TFLOPs/s".$
+$"H800 SXM FP8 tensor core FLOPs/s" = 1474 "TFLOPs/s"$.
 
-Available FLOPs in $2.79 "M"$ H800 hours, if using FP8:
-$
-  2.79 e 6 dot 3600 dot 1474 e 12.
-$
+Available FLOPs in $2.79 "M"$ H800 hours, if using FP8 = $ 2.79 e 6 dot 3600 dot 1474 e 12$.
 
 Hardware Utilization:
 $
   frac(6 dot 37 dot 14.8 dot 10^21, 2.79 dot 3600 dot 1474 dot 10^18)
-    = frac(6 dot 37 dot 14.8, 2.79 dot 3600 dot 1474) dot 10^3 \
+    = frac(6 dot 37 dot 14.8, 2.79 dot 3600 dot 1474) dot 10^3
     approx 0.00016 dot 10^3
     = 0.16.
 $
@@ -323,9 +284,9 @@ Scan pages: 13--15
 
 Assume training FLOPs. $E$ copies of standard MLP blocks, and each token activates $k$ of these experts. Consider the following model of MoE:
 $
-  h_e = sum_(i=1)^E g_(i,t) ("FFN"_i)(x_t),
+  h_t = sum_(i=1)^E g_(i,t) "FFN"_(i)(x_t),
 $
-where $("FFN"_i)(x_t) = W_i dot x_t$ and $W_i in bb(R)^(d times d)$.
+where $"FFN"_(i)(x_t) = W_i x_t$ and $W_i in bb(R)^(d times d)$.
 
 To compute the MoE layer, we will group the tokens belonging to an expert and then matmul. So in total we will do $E$ matmuls. Assume that every token randomly chooses $k$ numbers from ${1, ..., E}$.
 
@@ -340,19 +301,19 @@ $
   E[S_e]
     = sum_(i=1)^T P(X_(i,e))
     = sum_(i=1)^T frac(k, E)
-    approx frac(T dot k, E).
+    = frac(T dot k, E).
 $
 
 So then we do:
 
 ```text
-For e in {1,...,E}:
+For e in {1,...,E}
   1: [T*k/E, D] @ int8[D, D]
 ```
-
+Therefore:
 $
   "FLOPs" = E dot (2 dot frac(T dot k, E) dot D^2)
-    = 2 T k D^2, \
+    = 2 T k D^2 \
   "Bytes" = E dot (frac(2 T k, E) dot D + D^2)
     = 2 T k D + E D^2.
 $
@@ -366,12 +327,12 @@ $
 
 Therefore for being compute bound:
 $
-  frac(2 T k, E) > 480 \
-  => T > frac(E, k) dot frac(480, 2) := frac(E, k) dot 240.
+  frac(2 T k, E) > 240 \
+  => T > frac(E, k) dot frac(240, 2) := frac(E, k) dot 120.
 $
 
-So for DeepSeek V3 this number is $7680$.
-
-== Transcription uncertainties
-
-- In Exercise 4, the final numerical approximation after $frac(8, 5760 dot D)$ on scan page 8 was not legible enough to transcribe confidently, so it is marked inline as $["unclear"]$ rather than guessed.
+So for DeepSeek V3 this number is $3840$.
+(Note: While transcribing this execirse from the handwritten notes, I realized
+that I made an error and assumed that the operations were done in int8, but
+they are done in FP16, so I've corrected the of by 2 error in this transccribed
+notes, in the handwritten notes is not corrected).
