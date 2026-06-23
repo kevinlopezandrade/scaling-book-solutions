@@ -30,6 +30,13 @@ The book contains official/reference solutions. Do not mix those into my writeup
 Target transcription style:
 Use a direct, plain Typst style that is compact and easy to edit. The output should look like a cleaned transcription of handwritten work, not a polished textbook rewrite. Avoid custom wrapper blocks, decorative boxes, and repeated narration about what the handwriting says.
 
+Compactness rules:
+- Combine short setup fragments into readable sentences when this does not change meaning. For example, prefer `Let $A[I_X, J, K, ...]$ and $"Mesh" = {X:4, Y:8, Z:2}$.` over several separate one-line display equations.
+- Use inline math for short definitions, scalar values, and single-step facts.
+- Use display math for multi-step derivations, aligned equations, or formulas that are visually easier to scan as a block.
+- Do not create a separate display math block for every algebraic line. Group related lines into one display block using alignment points and `\` line breaks when useful.
+- Use concise lead-ins such as `Assume:`, `Since:`, `Hence:`, and `Therefore:` instead of explanatory narration about the transcription process.
+
 Required Typst structure:
 - Use Typst, not LaTeX.
 - Create a self-contained `.typ` file.
@@ -79,7 +86,8 @@ When transcribing:
 - Include exercise statements extracted from the markdown book, clearly separated from my solution under `=== Exercise statement`.
 - Put my work under `=== Solution`, beginning with `Scan pages: ...`.
 - If something in my handwriting is illegible, write `[illegible]` or add a Typst comment near that location. Do not guess from the book solution.
-- If a symbol is uncertain, mark it inline, for example `x [?]`, or add a short final `== Transcription uncertainties` section.
+- If a symbol is uncertain, mark it inline, for example `x [?]`. Add a final `== Transcription uncertainties` section only when there are specific unresolved uncertainties that are material to the transcription.
+- Do not add a generic uncertainty section just to say that my handwriting was terse, that an exercise had minimal surrounding prose, or that you made a conservative formatting choice.
 - Do not invent missing derivation steps.
 - Do not simplify, optimize, or rewrite my proof in a way that changes its content.
 - You can improve layout, notation consistency, spacing, headings, and obvious transcription formatting, but not the mathematical substance. I often write many blank spaces and place each implication arrow or derivation step on a new handwritten line; in Typst, group related steps into readable display equations without changing the substance.
@@ -98,9 +106,13 @@ $
 
 - Use normal paragraphs and bullets for assumptions or hardware facts.
 - Use fenced `text` code blocks for ASCII sketches, diagrams, tensor layouts, arrows, and simple tables from the handwriting.
-- Preserve diagrams as ASCII sketches when that is the clearest faithful transcription. Do not replace a handwritten schematic with only a prose description.
+- Preserve diagrams as ASCII sketches when they contain meaningful topology, routing, layout, or tensor-shape information. If a sketch is redundant with the adjacent formula or prose, transcribe the content concisely instead of adding visual clutter.
+- If an exercise asks for a plot, or my handwriting includes a plot whose curves can be reconstructed from the handwritten formulas and given constants, generate a simple plot image, save it next to the `.typ` file, and include it with `#image("...")`. Do not leave a required plot as only an ASCII placeholder. Do not use the book solution to invent plot data.
 - Use Typst strings inside math for units and labels, for example `$12.5 "GB"$`, `$T_("comms")$`, and `$"bf16" [B, D]$`.
 - Do not put leading or trailing spaces inside quoted math strings. Prefer `$10 "ms"$`, `$10^9 "bytes"$`, and `$1.2 e 12 "bytes/s"$`, not `$10 " ms"$` or `$10^9 " bytes"$`.
+- Put punctuation outside quoted math strings when practical. Prefer `$0.02 "ms".$` over `$0.02 "ms."$`.
+- Use Typst matrix-multiply notation with `dot` and dimension labels like `dot_J`, not `@`, unless the handwriting explicitly uses `@` as code-like notation.
+- Write collective axes with parenthesized subscripts, for example `$"AllGather"_(X)(A[I_X])$`, `$"AllGather"_(X Y)(A[I_X, J_Y])$`, and `$"AllReduce"_(Z)(A {U_Z})$`.
 - Keep approximate handwritten arithmetic as written when it is part of the solution, even if it is rough.
 - If my answer appears numerically or conceptually different from the book, preserve my answer and mark uncertainty only if the handwriting itself is unclear.
 - Use page breaks only where useful. Do not force every exercise onto a new page unless the document genuinely reads better that way.
