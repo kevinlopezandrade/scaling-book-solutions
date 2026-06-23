@@ -327,8 +327,8 @@ $
 
 Therefore for being compute bound:
 $
-  frac(2 T k, E) > 240 \
-  => T > frac(E, k) dot frac(240, 2) := frac(E, k) dot 120.
+  frac(2 T k, E) >= 240 \
+  => T >= frac(E, k) dot frac(240, 2) = frac(E, k) dot 120.
 $
 
 So for DeepSeek V3 this number is $3840$.
