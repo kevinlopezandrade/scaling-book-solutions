@@ -323,10 +323,10 @@ $
   T("Algo 2.2") &= frac(2 I K, W_("ICI")) approx frac(8 J, W_("ICI"))
 $
 
-So then Algo 2.2 and 2.1 are better than Algo 1.2 and Algo 1.1 when all are communication bound. And if Algo 1.2 and Algo 1.1 compute bound, Algo 2.1 and Algo 2.2 are better when:
+So then Algo 2.2 and 2.1 are better than Algo 1.2 and Algo 1.1 when all are communication bound. And if Algo 1.2 and Algo 1.1 are compute bound, Algo 2.1 and Algo 2.2 are better when:
 
 $
-  frac(8 J, W_("ICI")) < frac(8 J^2, "FLOPs/s")) => J > 3055
+  frac(8 J, W_("ICI")) < frac(8 J^2, "FLOPs/s") => J > 3055
 $
 
 In that case, between Algo 2.1 and Algo 2.2, Algo 2.2 is better since $K >> I$ and:
