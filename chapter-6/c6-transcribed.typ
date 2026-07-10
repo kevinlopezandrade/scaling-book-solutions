@@ -214,7 +214,7 @@ $
 Since no attention involved we just have to reshape after finishing. Therefore with FSDP we will do:
 
 $
-  "In"[(B dot L)_X, D] dot_D W_("in")[D_X, F] dot W_("out")^T[F, D].
+  "In"[(B dot L)_X, D] dot_D W_("in")[D_X, F] dot W_("out")[F, D].
 $
 
 Hence the condition to be compute bound is:

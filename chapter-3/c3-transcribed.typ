@@ -362,7 +362,7 @@ What about $A[I_X, J] dot_J B[J, K_Y] -> C[I_X, K_Y]$? This is standard for infe
 
 Scan pages: 25-28.
 
-Assume we have a $4 times 4$ slice of TPU v5e. Since $4 times 4$ is not a full pod in this setting we don't wraparound links.
+Assume we have a $4 times 4$ slice of TPU v5e. Since $4 times 4$ is not a full pod in this setting we don't have wraparound links.
 
 Let:
 
