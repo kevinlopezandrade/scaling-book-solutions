@@ -39,7 +39,7 @@ Compactness rules:
 
 Required Typst structure:
 - Use Typst, not LaTeX.
-- Create a self-contained `.typ` file.
+- Create a `.typ` source that is self-contained except for any local image assets you generate and explicitly include with `#image(...)`.
 - Format for A4 paper.
 - Prefer plain Typst constructs. Do not define custom `statement`, `solution`, or `note` block helpers unless there is a strong reason.
 - Do not put exercise statements or solutions inside decorative filled/stroked boxes.
@@ -106,13 +106,17 @@ $
 
 - Use normal paragraphs and bullets for assumptions or hardware facts.
 - Use fenced `text` code blocks for ASCII sketches, diagrams, tensor layouts, arrows, and simple tables from the handwriting.
-- Preserve diagrams as ASCII sketches when they contain meaningful topology, routing, layout, or tensor-shape information. If a sketch is redundant with the adjacent formula or prose, transcribe the content concisely instead of adding visual clutter.
-- If an exercise asks for a plot, or my handwriting includes a plot whose curves can be reconstructed from the handwritten formulas and given constants, generate a simple plot image, save it next to the `.typ` file, and include it with `#image("...")`. Do not leave a required plot as only an ASCII placeholder. Do not use the book solution to invent plot data.
+- Preserve simple diagrams as ASCII sketches when they contain meaningful topology, routing, or layout information. If a sketch is redundant with the adjacent formula or prose, transcribe the content concisely instead of adding visual clutter.
+- If the handwriting includes a nontrivial diagram, computational graph, or plot that would be hard to read as ASCII, generate a clean local image asset, save it next to the `.typ` file, and include it with `#image("...")`.
+- If an exercise asks for a plot, or my handwriting includes a plot whose curves can be reconstructed from the handwritten formulas and given constants, generate a simple plot image. Do not leave a required plot as only an ASCII placeholder. Do not use the book solution to invent plot data.
 - Use Typst strings inside math for units and labels, for example `$12.5 "GB"$`, `$T_("comms")$`, and `$"bf16" [B, D]$`.
 - Do not put leading or trailing spaces inside quoted math strings. Prefer `$10 "ms"$`, `$10^9 "bytes"$`, and `$1.2 e 12 "bytes/s"$`, not `$10 " ms"$` or `$10^9 " bytes"$`.
 - Put punctuation outside quoted math strings when practical. Prefer `$0.02 "ms".$` over `$0.02 "ms."$`.
+- Use `\` in display math only between lines, never as a dangling line break at the end of a block or expression.
+- Use adjacency for ordinary scalar symbolic products when it reads cleanly, for example `$N H = D$`, `$D V$`, and `$4D$`. Use `dot`, `times`, or explicit spacing when needed for clarity, numeric products, tensor contractions, or dimension-labelled operations.
 - Use Typst matrix-multiply notation with `dot` and dimension labels like `dot_J`, not `@`, unless the handwriting explicitly uses `@` as code-like notation.
 - Write collective axes with parenthesized subscripts, for example `$"AllGather"_(X)(A[I_X])$`, `$"AllGather"_(X Y)(A[I_X, J_Y])$`, and `$"AllReduce"_(Z)(A {U_Z})$`.
+- Use `:=` only when the handwriting clearly defines a new quantity. For ordinary algebraic simplification or threshold solving, use `=`, `>=`, `<=`, `>`, or `<` as appropriate.
 - Keep approximate handwritten arithmetic as written when it is part of the solution, even if it is rough.
 - If my answer appears numerically or conceptually different from the book, preserve my answer and mark uncertainty only if the handwriting itself is unclear.
 - Use page breaks only where useful. Do not force every exercise onto a new page unless the document genuinely reads better that way.
@@ -133,6 +137,7 @@ Final output:
 Give me links to:
 1. the compiled PDF
 2. the `.typ` source file
+3. any generated image assets used by the `.typ` file
 
 Also include a brief note with:
 - how many pages were in the input scan
