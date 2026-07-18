@@ -77,7 +77,7 @@ Assume TPU v5e 4x4 slice where v5e HBM = $16 "GB"$.
 Note that:
 
 $
-  "Space per shard" = frac(M + B S L K H, |X|).
+  "Space per shard" = frac(M + B 2 S L K H, |X|).
 $
 
 $
@@ -134,7 +134,7 @@ How long does it take to load all the parameters into the MXU from HBM assuming 
 Scan pages: 3
 
 Assume TPU v5e 4x4 slice where v5e $"BW" = 8.2 dot 10^11$.
-Therefore to load $M / |X|$ into the MXU it takes:
+Therefore to load $frac(M, |X|)$ into the MXU it takes:
 
 $
   frac(M, |X|) dot frac(1, "BW")
