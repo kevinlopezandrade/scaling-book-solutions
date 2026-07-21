@@ -1,197 +1,259 @@
-#set page(paper: "a4", margin: (x: 18mm, y: 17mm))
-#set text(size: 10.4pt, lang: "en")
-#set par(justify: true, leading: 0.58em)
-#set heading(numbering: "1.")
+#set page(
+  paper: "a4",
+  margin: (x: 18mm, y: 17mm),
+)
+#set text(
+  font: ("New Computer Modern", "CMU Serif", "Libertinus Serif", "Times New Roman"),
+  lang: "en",
+  size: 10.3pt,
+)
+#set heading(numbering: none)
+#set par(justify: false, leading: 0.62em)
 
-#let statement(body) = block(width: 100%, fill: rgb("#f6f6f6"), stroke: rgb("#d7d7d7"), radius: 4pt, inset: 8pt)[
-  *Exercise statement (from book markdown).* #body
-]
+= Scaling Book Exercises -- Chapter 1
 
-#let solution(body) = block(width: 100%, fill: rgb("#fbfcff"), stroke: rgb("#c9d7ef"), radius: 4pt, inset: 8pt)[
-  *Transcribed solution (from handwriting only).* #body
-]
+Chapter: 1 -- All About Rooflines\
+Source: handwritten Onyx Boox A4 PDF\
+Note: Transcribed from handwritten solutions; book markdown used only for exercise statements and notation.
 
-#let note(body) = block(width: 100%, fill: rgb("#fff8e6"), stroke: rgb("#ead7a0"), radius: 4pt, inset: 8pt)[#body]
+== Exercise 1 -- int8 matmul
 
-= Chapter 1 Solutions: All About Rooflines
+=== Exercise statement
 
-#note[
-This document typesets the exercise statements for Chapter 1 and the handwritten solution content from `C1.pdf`. The solution sections preserve the handwritten derivations, including incomplete or uncertain portions. Book solution content was not used to complete, correct, or improve the transcriptions.
-]
-
-== Exercise 1: int8 matmul
-
-#statement[
-Say we want to do the matmul $X[B, D] dot_D Y[D, F] arrow.r Z[B, F]$ in int8 precision (1 byte per parameter) instead of bfloat16 (2 bytes per parameter) since TPUs/GPUs can do matmuls faster in lower precision.
+Say we want to do the matmul $X[B, D] dot_D Y[D, F] -> Z[B, F]$ in int8 precision (1 byte per parameter) instead of bfloat16 (2 bytes per parameter) since TPUs/GPUs can do matmuls faster in lower precision.
 
 1. How many bytes need to be loaded from memory? How many need to be written back to memory?
 2. How many total OPs are performed?
 3. What is the arithmetic intensity?
-4. What is a roofline estimate for $T_"math"$ and $T_"comms"$? What are reasonable upper and lower bounds for the runtime of the whole operation?
+4. What is a roofline estimate for $T_("math")$ and $T_("comms")$? What are reasonable upper and lower bounds for the runtime of the whole operation?
 
-Assume our HBM bandwidth is `8.2e11` bytes/s and our int8 peak OPs/s is `3.94e14` (about 2x bfloat16).
-]
+Assume our HBM bandwidth is $8.2 dot 10^11 "bytes/s"$ and our int8 peak OPs/s is $3.94 dot 10^14$ (about 2x bfloat16).
 
-#solution[
-The handwritten setup is
-$ X[B, D] dot_D Y[D, F] arrow.r Z[B, F]. $
+=== Solution
 
-Communication bytes are written as
-$ B dot D + D dot F + B dot F. $
+Scan pages: 1-2
 
-The dot products are counted as follows: there are $B dot F$ dot products, and each dot product has $D$ multiplications and $D - 1$ sums. Therefore,
-$ "OPs" = B dot F dot (D + D - 1) = B dot F dot (2 dot D - 1). $
+$X[B, D] dot_D Y[D, F] -> Z[B, F]$.
 
-The arithmetic intensity is written as
-$ "AI" = frac(B dot F dot (2 dot D - 1), B dot D + D dot F + B dot F). $
+Bytes per int8:
+$
+  1 dot (B D + D F + B F) = B D + D F + B F.
+$
 
-The math time is
-$ T_"math" = frac(B dot F dot (2 dot D - 1), 3.94 times 10^14). $
+There are $B F$ dot products. A dot product has $D$ multiplications and
+$
+  a_1 b_1 + a_2 b_2 + dots + a_D b_D,
+$
+so $D - 1$ sums. Total OPs is then
+$
+  "OPs" = B F (D + D - 1) = B F (2D - 1).
+$
 
-The handwritten approximation note for this line is
-$ T_"math" approx frac(B dot F dot (D - 1), 2 times 10^14) quad "seconds". $
+$
+  "AI" = frac(B F (2D - 1), B D + D F + B F).
+$
 
-The communication time is
-$ T_"comms" = frac(B dot D + D dot F + B dot F, 8.2 times 10^11). $
+$
+  T_("math")^(*)
+    &= frac(B F (2D - 1), 3.94 dot 10^14 "s"^(-1)) \
+    &approx frac(B F (D - 1), 2 dot 10^14) "seconds".
+$
 
-The operation time is bounded by
-$ max(T_"comms", T_"math") <= T_"operation" <= T_"comms" + T_"math". $
-]
+$G = 10^9$ and $T = 10^12$.
 
-== Exercise 2: int8 + bf16 matmul
+$
+  T_("comms") = frac(B D + D F + B F, 8.2 dot 10^11 "bytes/s").
+$
 
-#statement[
-In practice we often do different weight vs. activation quantization, so we might store our weights in very low precision but keep activations (and compute) in a higher precision. Say we want to quantize our weights in int8 but keep activations (and compute) in bfloat16. At what batch size do we become compute bound? Assume `1.97e14` bfloat16 FLOPs/s.
+$
+  max(T_("comms"), T_("math"))
+    <= T_("operation")
+    <= T_("comms") + T_("math").
+$
 
-Hint: this means specifically `bf16[B, D] * int8[D, F] -> bf16[B, F]` where $B$ is the batch size.
-]
+== Exercise 2 -- int8 weights and bfloat16 activations
 
-#solution[
-The accelerator FLOPs for bfloat16 are transcribed as
-$ 1.97 times 10^14 approx 2 times 10^14. $
+=== Exercise statement
 
-The operation is written as
-$ "bf16"[B, D] dot_D "int8"[D, F] arrow.r "bf16"[B, F]. $
+In practice we often do different weight vs. activation quantization, so we might store our weights in very low precision but keep activations (and compute) in a higher precision. Say we want to quantize our weights in int8 but keep activations (and compute) in bfloat16. At what batch size do we become compute bound? Assume $1.97 dot 10^14$ bfloat16 FLOPs/s.
 
-A handwritten note says: assuming no copy is needed to cast int8 to bf16.
+Hint: this means specifically `bf16[B, D] * int8[D, F] -> bf16[B, F]` where $B$ is the "batch size".
 
-The arithmetic intensity is written as
-$ "AI" = frac(B dot F dot (2 dot D - 1), 2 dot B dot D + D dot F + 2 dot B dot F). $
+=== Solution
 
-The hardware ratio is written as
-$ frac(1.97 times 10^14 " FLOPs/s", 8.2 times 10^11 " bytes/s") approx frac(2, 8) dot frac(10^14, 10^11) = frac(1, 4) dot 10^3 = 2.5 dot 10^2. $
+Scan pages: 3-4
 
-Approximating the intensity, the handwritten assumptions are
-$D >> B, quad F >> B, quad D F >> 2 dot B D, quad D F >> 2 dot B F,$
-so
-$D F >> 2 dot B D + 2 dot B F.$
+Accelerator FLOPs/s for bf16:
+$
+  1.97 dot 10^14 approx 2 dot 10^14.
+$
 
-Then
-$ frac(2 dot B dot F dot D, D F) > 250, $
-so
-$ B > 125. $
+```text
+bf16[B, D]_D @ int8[D, F] -> bf16[B, F]
+```
 
-The final handwritten prose note is transcribed as:
-#quote(block: true)[
-"Per second I do more starts of the algorithm since less bytes to be transfer, so then per algorithm FLOPs can be smaller"
-]
-]
+Assuming no conv. needed to cast int8 to bf16.
 
-== Exercise 3: roofline plot for two sizes
+$
+  "AI"
+    &= frac(B F (2D - 1), 2 B D + D F + 2 B F) \
+    &>= frac(1.97 dot 10^14 "FLOPs/s", 8.2 dot 10^11 "bytes/s") \
+    &approx frac(2, 8) dot frac(10^14, 10^11) \
+    &= frac(1, 4) dot 10^3 \
+    &= 2.5 dot 10^2 \
+    &= 250 "FLOPs/Byte".
+$
 
-#statement[
+Approximating:
+$
+  "AI" approx frac(2 B F D, D F).
+$
+
+Assume:
+$
+  D >> B, quad F >> B, \
+  D F >> 2 B D, quad D F >> 2 B F, \
+  "then" quad D F >> 2 B D + 2 B F.
+$
+
+Hence:
+$
+  frac(2 B F D, D F) > 250
+  quad => quad B > 125.
+$
+
+"For second I do more [illegible] at algorithm since less bytes to be transfer, so then per-algo FLOPs can be smaller."
+
+== Exercise 3 -- roofline plot for two matrix sizes
+
+=== Exercise statement
+
 Taking the setup from Question 2, make a roofline plot of peak FLOPs/s vs. $B$ for $F = D = 4096$ and $F = D = 1024$. Use the exact number of bytes loaded, not an approximation.
-]
 
-#solution[
-The accelerator numbers are written as:
+=== Solution
 
-- Accelerator bfloat16: $1.97 times 10^14$.
-- Accelerator HBM: $8.2 times 10^11$.
+Scan pages: 5-8
 
-The handwritten formula for achievable FLOPs is
-$ "Achievable FLOPs" = "AI" times "BW". $
+- Accelerator bfloat16: $1.97 dot 10^14$.
+- Accelerator HBM: $8.2 dot 10^11$.
 
-Using the exact bytes from the handwritten notes:
-$ frac(2 dot B F D, 2 dot B D + D F + 2 dot B F) dot "BW". $
+Achievable FLOPs:
+$
+  "AI" times "BW"
+    = frac(2 B F D, 2 B D + D F + 2 B F) dot "BW".
+$
 
-The two cases are
-$D = F = 4096 quad | quad F = D = 1024.$
+Use $D = F = 4096$ and $F = D = 1024$.
 
-The handwritten line for achievable FLOPs/s is written as
-$ "Achievable FLOPs/s" = min( frac(2 dot B D F, 2 dot B D + D F + 2 dot B F) dot "BW", 1.97 times 10^14 ). $
+$
+  "Achievable FLOPs/s"
+    = max(
+      frac(2 B D F, 2 B D + D F + 2 B F) dot "BW",
+      1.97 dot 10^14
+    ).
+$
 
 Assuming $D = F$:
-$ frac(2 dot B dot D^2, 2 dot B dot D + D^2 + 2 dot B dot D)
- = frac(2 dot B dot D^2, 4 dot B dot D + D^2)
- = frac(2 dot B dot D^2, D dot (4 dot B + D))
- = frac(2 dot B dot D, 4 dot B + D). $
+$
+  frac(2 B D^2, 2 B D + D^2 + 2 B D)
+    &= frac(2 B D^2, 4 B D + D^2) \
+    &= frac(2 B D^2, D (4 B + D)) \
+    &= frac(2 B D, 4 B + D).
+$
 
-With $D = 2^k$,
-$ frac(2 dot B dot 2^k, 4 dot B + 2^k)
- = frac(2 dot B dot 2^k, 2^k dot (frac(B, 2^(k - 2)) + 1))
- = frac(2 dot B, frac(B, 2^(k - 2)) + 1) dot "BW". $
+Let $D = 2^k$:
+$
+  frac(2 B 2^k, 4 B + 2^k)
+    &= frac(2 B 2^k, 2^k (frac(1 B, 2^(k - 2)) + 1)) \
+    &= frac(2 B, frac(1 B, 2^(k - 2)) + 1) dot "BW".
+$
 
-The handwritten parameter choices are:
+$k = 12$ for $D = 4096$; $k = 10$ for $D = 1024$.
 
-- $K = 12$ for $D = 4096$.
-- $K = 10$ for $D = 1024$.
+$
+  log(2 dot B)
+    - log(frac(1 B, 2^(k - 2)) + 1)
+    + log("BW") \
+  approx log(2 dot B)
+    - frac(B, 2^(k - 2))
+    + log("BW").
+$
 
-The logarithmic form is written as
-$ log(2 dot B) - log(frac(B, 2^(k - 2)) + 1) + log("BW"). $
+The plot below reconstructs the rising curves and common plateau shown in the handwritten sketch.
 
-The next approximation is written as
-$ approx log(2 dot B) - frac(B, 2^(k - 2)) + log("BW"). $
-
-The handwritten sketch is a roofline plot with vertical axis $log("FLOPs")$ and horizontal axis $log(B)$. It shows two rising lines that flatten at a horizontal peak; the line labeled `4096` reaches the flat region before the line labeled `1024`. The horizontal axis has marked positions near `7` and `8`.
-
-The threshold calculations under the sketch are transcribed as
-$ frac(2 dot B dot 4096, 4B + 4096) > 250 quad "FLOPs/Byte" $
-which gives
-$ B approx 142, $
-
-and
-$ frac(2 dot B dot 1024, 4B + 1024) > 250, $
-which gives
-$ B approx 244. $
+#align(center)[
+  #image("c1-roofline-q3.png", width: 92%)
 ]
 
-== Exercise 4: batch-specific matrices
+For $D = 4096$:
+$
+  frac(2 B dot 4096, 4 B + 4096) > 250 "FLOPs/token"
+  quad => quad B approx 142.
+$
 
-#statement[
-What if we wanted to perform $"int8"[B, D] dot_D "int8"[B, D, F] arrow.r "int8"[B, F]$ where we imagine having a different matrix for each batch element. What is the arithmetic intensity of this operation?
-]
+For $D = 1024$:
+$
+  frac(2 B dot 1024, 4 B + 1024) > 250
+  quad => quad B approx 244.
+$
 
-#solution[
-The handwritten setup is transcribed as:
-$ B " times " "int8"[D] dot "int8"[D, F] arrow.r "int8"[F] $
+== Exercise 4 -- different matrix for each batch element
 
-The FLOPs count is
-$ "FLOPs" = B dot (2 dot F D). $
+=== Exercise statement
 
-Therefore,
-$ "AI" = frac(B dot 2 dot F D, B dot (D + D F + F))
- = frac(2 dot F D, D + D F + F). $
-]
+What if we wanted to perform $"int8"[B, D] dot_D "int8"[B, D, F] -> "int8"[B, F]$ where we imagine having a different matrix for each batch element. What is the arithmetic intensity of this operation?
 
-== Exercise 5: Memory rooflines for GPUs
+=== Solution
 
-#statement[
-Using the spec sheet provided by NVIDIA for the H100 SXM, calculate the batch size at which a bfloat16 matrix multiplication will become compute-bound. Note that the Tensor Core FLOPs numbers are twice the true value since they're only achievable with structured sparsity.
-]
+Scan page: 9
 
-#solution[
-The accelerator FLOPs are transcribed as
-$ frac(1979, 2) dot 10^12 approx 989.5 dot 10^12 = 9.89 times 10^14. $
+```text
+B times int8[D] @ int8[D, F] -> int8[F]
+```
 
-The condition is written as
-$ frac(2 dot B F D, 2 dot B D + 2 dot D F + 2 dot B F) > frac(9.84 times 10^14, 3.75 times 10^12). $
+$
+  "FLOPs" = B (2 F D).
+$
 
-Using the handwritten assumptions
-$D >> B, quad F >> B,$
-this becomes
-$ frac(2 dot B F D, 2 dot D F) > 295. $
+Therefore:
+$
+  "AI"
+    = frac(B dot 2 F D, B (D + D F + F))
+    = frac(2 F D, D + D F + F).
+$
 
-Thus,
-$ B > 295. $
-]
+== Exercise 5 -- memory roofline for H100 SXM
+
+=== Exercise statement
+
+Using the spec sheet provided by NVIDIA for the H100 SXM, calculate the batch size at which a bfloat16 matrix multiplication will become compute-bound. Note that the Tensor Core FLOPs numbers are twice the true value since they are only achievable with structured sparsity.
+
+=== Solution
+
+Scan pages: 9-10
+
+Accelerator FLOPs:
+$
+  frac(1979 dot 10^12, 2)
+    approx 989.5 dot 10^12
+    = 9.89 dot 10^14.
+$
+
+$
+  frac(2 B F D, 2 B D + 2 D F + 2 B F)
+    >= frac(9.84 dot 10^14, 3.35 dot 10^12).
+$
+
+Assume $D >> B$ and $F >> B$.
+
+Hence, cancelling $2 D F$:
+$
+  frac(2 B F D, 2 D F) >> 295,
+  quad B >> 295.
+$
+
+== Transcription uncertainties
+
+- On scan page 4, the word after "more" in the final quoted note is illegible and is marked `[illegible]`.
+- In Exercise 3, scan page 6 writes $max(...)$, while the scan-page-8 sketch shows curves capped at the common peak. The formula is transcribed as written; the generated plot follows the drawn capped shape.
+- In Exercise 5, scan page 9 gives $9.89 dot 10^14$, while the numerator on scan page 10 appears to be $9.84 dot 10^14$. Both values are preserved where they occur.
