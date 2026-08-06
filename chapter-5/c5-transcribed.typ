@@ -1,12 +1,5 @@
-#set page(paper: "a4", margin: (x: 18mm, y: 18mm))
-#set text(
-  font: ("New Computer Modern", "CMU Serif", "Libertinus Serif", "Times New Roman"),
-  lang: "en",
-  size: 10pt,
-)
-#set par(justify: false, leading: 0.55em)
-#set raw(block: true, tab-size: 2)
-#show raw: set text(size: 8.5pt)
+#import "../template/layout.typ": with-layout
+#show: with-layout
 
 = Scaling Book Exercises -- Chapter 5
 
@@ -20,9 +13,8 @@ Let's use LLaMA-2 13B as a basic model for this section. Here are the model deta
 
 #table(
   columns: 2,
-  inset: (x: 6pt, y: 3pt),
   align: (left, right),
-  [*hyperparam*], [*value*],
+  table.header([*hyperparam*], [*value*]),
   [$L$], [$40$],
   [$D$], [$5,120$],
   [$F$], [$13824$],

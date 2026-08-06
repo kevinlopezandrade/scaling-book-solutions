@@ -1,14 +1,5 @@
-#set page(
-  paper: "a4",
-  margin: (x: 18mm, y: 17mm),
-)
-#set text(
-  font: ("New Computer Modern", "CMU Serif", "Libertinus Serif"),
-  size: 10.5pt,
-  lang: "en",
-)
-#set par(leading: 0.68em, spacing: 0.62em)
-#set heading(numbering: none)
+#import "../template/layout.typ": with-layout
+#show: with-layout
 
 = Scaling Book Exercises -- Chapter 8
 
@@ -459,8 +450,6 @@ $
 $
 
 So we need 7 more prefill servers than decoding servers.
-
-#pagebreak()
 
 == Exercise 1 -- LLaMA 3-405B forward-pass bounds
 

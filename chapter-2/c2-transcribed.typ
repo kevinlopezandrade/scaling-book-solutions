@@ -1,7 +1,5 @@
-#set text(
-  font: ("New Computer Modern", "CMU Serif", "Libertinus Serif", "Times New Roman"),
-  lang: "en",
-)
+#import "../template/layout.typ": with-layout
+#show: with-layout
 
 = Scaling Book Exercises — Chapter 2
 

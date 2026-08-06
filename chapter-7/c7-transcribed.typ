@@ -1,15 +1,5 @@
-#set page(
-  paper: "a4",
-  margin: (top: 16mm, bottom: 17mm, left: 18mm, right: 18mm),
-  numbering: "1",
-)
-#set text(
-  font: ("New Computer Modern", "CMU Serif", "Libertinus Serif", "Times New Roman"),
-  size: 10.5pt,
-  lang: "en",
-)
-#set par(leading: 0.62em)
-#set heading(numbering: none)
+#import "../template/layout.typ": with-layout
+#show: with-layout
 
 = Scaling Book Exercises -- Chapter 7
 
