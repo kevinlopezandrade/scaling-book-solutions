@@ -76,13 +76,13 @@ $16 times 16 = 256$
 
 ```text
 [ ][ ][ ][ ][ ][ ][ ][ ] ...
-<------ 8 ------> is a host
+<---------- 8 ---------> is a host
 ```
 and then divide i.e $256/8 = 32$ hosts.
 
-TPU v5e has only one Tensor Core per chip $=> 256 " Tensor Cores".$ Also you
+TPU v5e has only one Tensor Core per chip $=> 256 "Tensor Cores".$ Also you
 can derive by cores per host and from the book you see using previous result:
-$32 times 8 = 256 " Tensor Cores"$ where 32 is hosts in the pod and 8 is cores per host.
+$32 times 8 = 256 "Tensor Cores"$ where 32 is hosts in the pod and 8 is cores per host.
 
 Total FLOPs/s = $256 times 1.97 e 14 approx 500 e 14$
 
@@ -217,20 +217,20 @@ $4096 times (4 dot 4096) approx 68 dot 10^6$. At least the weights do fit in VME
 Bottleneck: compute bound when?
 $
   T_("comms")(B, "BW") <= T_("math")(B)
-  => frac(B dot 5 dot D + 4 dot D^2, "BW")
+  <=> frac(B dot 5 dot D + 4 dot D^2, "BW")
     <= frac(8 dot B dot D^2, 3.94 e 14 " FLOPs/s") \
-  => frac(B dot 5 dot D + 4 dot D^2, 8 dot B dot D^2)
+  <=> frac(B dot 5 dot D + 4 dot D^2, 8 dot B dot D^2)
     <= frac("BW", 3.94 e 14)
     = "AI"^(-1)
-  => frac(B dot 5 dot D, 8 dot B dot D^2)
+  <=> frac(B dot 5 dot D, 8 dot B dot D^2)
     + frac(4 dot D^2, 8 dot B dot D^2)
     <= "AI"^(-1) \
-  => 0 <= frac(5, 8 dot D) + frac(4, 8 dot B) <= "AI"^(-1)
-  => frac(4, 8 dot B) <= "AI"^(-1) - frac(5, 8 dot D) \
-  => frac(1, 2 dot B) <= "AI"^(-1) - frac(5, 8 dot D)
-  => frac(1, B) <= 2 dot "AI"^(-1) - frac(10, 8 dot D) \
-  => B >= frac(1, 2 dot (1 / "AI") - frac(10, 8 dot D))
-  => B >= frac(1, 2 dot (frac("BW", 3.94 e 14)) - 3 dot 10^(-4))
+  <=> 0 <= frac(5, 8 dot D) + frac(4, 8 dot B) <= "AI"^(-1)
+  <=> frac(4, 8 dot B) <= "AI"^(-1) - frac(5, 8 dot D) \
+  <=> frac(1, 2 dot B) <= "AI"^(-1) - frac(5, 8 dot D)
+  <=> frac(1, B) <= 2 dot "AI"^(-1) - frac(10, 8 dot D) \
+  <=> B >= frac(1, 2 dot (1 / "AI") - frac(10, 8 dot D))
+  <=> B >= frac(1, 2 dot (frac("BW", 3.94 e 14)) - 3 dot 10^(-4))
 $
 
 $"BW"_("HBM") = 8.2 e 11$
@@ -377,8 +377,8 @@ Host 0 (4x2)             Host 1 (4x2)
 
 No wraparound links.
 
-$"int8" A[128 dot 1024, 128 dot 1024]$. Assume each host DRAM has an even part of the array $A => frac(128^2 dot 1024^2, 2) approx 8.6 " GB"$
-per host, so it fits in v5e HBM, which is $16 " GB"$.
+$"int8" A[128 dot 1024, 128 dot 1024]$. Assume each host DRAM has an even part of the array $A => frac(128^2 dot 1024^2, 2) approx 8.6 "GB"$
+per host, so it fits in v5e HBM, which is $16 "GB"$.
 
 *Path*
 

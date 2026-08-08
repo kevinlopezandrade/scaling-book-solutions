@@ -154,13 +154,13 @@ $
 For $D = 4096$:
 $
   frac(2 B dot 4096, 4 B + 4096) > 250 "FLOPs/token"
-  quad => quad B approx 142.
+  <=> B approx 142.
 $
 
 For $D = 1024$:
 $
   frac(2 B dot 1024, 4 B + 1024) > 250
-  quad => quad B approx 244.
+  <=> B approx 244.
 $
 
 == Exercise 4 -- different matrix for each batch element
@@ -211,5 +211,5 @@ $
 Assume $D >> B$ and $F >> B$.
 Hence:
 $
-  frac(2 B F D, 2 D F) >= 295 => B >= 295.
+  frac(2 B F D, 2 D F) >= 295 <=> B >= 295.
 $
