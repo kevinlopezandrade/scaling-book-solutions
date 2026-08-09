@@ -30,7 +30,11 @@ LLaMA-2 has separate embedding and output matrices and a gated MLP block.
 
 === Exercise statement
 
-How many parameters does LLaMA-2 13B have (I know that's silly but do the math)? _Note that, as in Transformer Math, LLaMA-3 has 3 big FFW matrices, two up-projection and one down-projection. We ignored the two "gating" einsum matrices in this section, but they behave the same as $W_("in")$ in this section._
+How many parameters does LLaMA-2 13B have (I know that's silly but do the
+math)? _Note that, as in Transformer Math, LLaMA-3 has 3 big FFW matrices, two
+up-projection and one down-projection. We ignored the two "gating" einsum
+matrices in this section, but they behave the same as $W_("in")$ in this
+section._
 
 === Solution
 
@@ -39,15 +43,15 @@ Scan pages: 1
 From LLAMA2 we know that $N = K$. Therefore:
 
 $
-  "MLP Params" = 3 D F " per layer" \
-  "Attention Params" = 4 D N H " per layer" \
-  "Embeddings" = 2 D V " overall".
+  "MLP Params" &= 3 D F "per layer" \
+  "Attention Params" &= 4 D N H "per layer" \
+  "Embeddings" &= 2 D V "overall".
 $
 
 In total we have $(3 D F + 4 D N H) dot L + 2 D V$ parameters. Let $L = 40$, $N H = D$, $D = 5120$, $F = 13824$, and $V = 32,000$. Hence:
 
 $
-  (3 dot 5120 dot 13824 + 4 (5120)^2) dot 40 + 2 dot 5120 dot 32 e 3 \
+  (3 dot 5120 dot 13824 + 4 (5120)^2) dot 40 + 2 dot 5120 dot 32 e 3
   = 13,015,449,600 approx 13 dot 10^9 = 13 " Billion".
 $
 
@@ -75,10 +79,10 @@ Activation Checkpointing:
 
 $
   L dot (2 B T F + 2 B T F + 2 B T D)
-    = 40 dot (4 B T F + 2 B T D) \
-    = 40 dot (B T) dot (4 F + 2 D) \
-    = 40 dot (16 e 6) dot (4 dot 13824 + 2 dot 5120) \
-    approx 42 "TB".
+    &= 40 dot (4 B T F + 2 B T D) \
+    &= 40 dot (B T) dot (4 F + 2 D) \
+    &= 40 dot (16 e 6) dot (4 dot 13824 + 2 dot 5120) \
+    &approx 42 "TB".
 $
 
 == Exercise 3 -- 32k training on TPU v5p 16x16x16
@@ -98,9 +102,9 @@ Scan pages: 2-11
 Let:
 
 $
-  "HBM v5p" = 96 "GB" \
-  "bf16 FLOPs/s v5p" approx 4.59 e 14 \
-  W_("ICI") " v5p" approx 1.8 e 11.
+  "HBM v5p" &= 96 "GB" \
+  "bf16 FLOPs/s v5p" &approx 4.59 e 14 \
+  W_("ICI") " v5p" &approx 1.8 e 11.
 $
 
 ==== 3.1
@@ -110,35 +114,29 @@ We cannot use data parallelism since a lower bound in memory per chip we need is
 ==== 3.2
 
 Assume FSDP shards the whole architecture as follows. For the attention params:
-
-```text
-Wq[D_X, N, H]
-Wk[D_X, N, H]
-Wv[D_X, N, H]
-Wo[N, H, D_X]
-```
-
-and for the MLP params as usual:
-
-```text
-Win1[D_X, F]
-Win2[D_X, F]
-Wout[F, D_X]
-```
-
-and for input output embeddings as:
-
-```text
-Wembed[V, D_X]
-Woutembed[D_X, V]
-```
-
-Therefore the total params per device is
-
 $
-  (3 frac(D, |X|) F + 4 frac(D, |X|) H N) dot L + 2 frac(D, |X|) V \
-  = frac(1, |X|) dot ((3 D F + 4 D H N) dot L + 2 D V) \
-  approx frac("Model Params", |X|).
+W_(q)[D_X, N, H] quad
+W_(k)[D_X, N, H] quad
+W_(v)[D_X, N, H] quad
+W_(o)[N, H, D_X]
+$
+and for the MLP params as usual:
+$
+W_("in1")[D_X, F] quad
+W_("in2")[D_X, F] quad
+W_("out")[F, D_X] quad
+$
+and for input output embeddings as:
+$
+W_("embed")[V, D_X] quad
+W_("outembed")[D_X, V] quad
+$
+
+Therefore the total params per device is:
+$
+  (3 frac(D, |X|) F + 4 frac(D, |X|) H N) dot L + 2 frac(D, |X|) V
+  &= frac(1, |X|) dot ((3 D F + 4 D H N) dot L + 2 D V) \
+  &approx frac("Model Params", |X|).
 $
 
 For LLAMA2 13B therefore:
@@ -157,25 +155,24 @@ $
 $
 
 If we also take into account the activation checkpointings which are of shapes:
-
-```text
-[B_X, T, F]
-[B_X, T, F]
+$
+[B_X, T, F] quad
+[B_X, T, F] quad
 [B_X, T, D]
-```
+$
 
 we get:
 
 $
   "Checkpoints per device"
-    = L dot (2 frac(B, |X|) dot T D + 4 frac(B, |X|) T F) " Bytes" \
-    = frac(1, |X|) dot (L dot (B T) dot (4 F + 2 D)) " Bytes".
+    &= L dot (2 frac(B, |X|) dot T D + 4 frac(B, |X|) T F) " Bytes" \
+    &= frac(1, |X|) dot (L dot (B T) dot (4 F + 2 D)) " Bytes".
 $
 
 Let $B T = 3 dot 10^6$, then:
 
 $
-  frac(1, 16^3) dot (40 dot (3 dot 10^6) dot (4 dot 13824 + 2 dot 5120)) \
+  frac(1, 16^3) dot (40 dot (3 dot 10^6) dot (4 dot 13824 + 2 dot 5120))
   approx 1.9 "GB".
 $
 
@@ -185,7 +182,7 @@ We could use FSDP since with FSDP sharding everything fits in memory, but we wou
 
 $
   frac(B, |X|) > frac(2550, M_X)
-    arrow.l.r frac(M_X dot B, 2550) > |X|.
+    <=> frac(M_X dot B, 2550) > |X|.
 $
 
 Let $B = 3 dot 10^6$ and $M_X = 3$, therefore:
@@ -194,41 +191,41 @@ $
   frac(9 dot 10^6, 2550) approx 3530 > |X|,
 $
 
-and in our slice $|X| = 4046$ [?].
+and in our slice $|X| = 4046$.
 
-==== 3.2
+==== 3.3
 
 Assume we shard the attention matrices as:
 
-```text
-Wq[D_X, N_Y, H]
-Wk[D_X, N_Y, H]
-Wv[D_X, N_Y, H]
-Wo[N_Y, H, D_X]
-```
+$
+W_(q)[D_X, N_Y, H] quad
+W_(k)[D_X, N_Y, H] quad
+W_(v)[D_X, N_Y, H] quad
+W_(o)[N_Y, H, D_X]
+$
 
 and for the MLP params as:
 
-```text
-Win1[D_X, F_Y]
-Win2[D_X, F_Y]
-Wout[F_Y, D_X]
-```
+$
+W_("in1")[D_X, F_Y] quad
+W_("in2")[D_X, F_Y] quad
+W_("out")[F_Y, D_X]
+$
 
 and for input and output embeddings as:
 
-```text
-Vembed[V_Y, D_X]
-Voutembed[D_X, V_Y]
-```
+$
+V_("embed")[V_Y, D_X] quad
+V_("outembed")[D_X, V_Y]
+$
 
 Therefore total params per device is:
 
 $
   (3 frac(D, |X| |Y|) F + 4 frac(D, |X|) dot frac(H N, |Y|)) dot L
-    + 2 frac(D, |X| |Y|) V \
-  = frac(1, |X| |Y|) dot (L dot (3 D F + 4 D H N) + 2 D V) \
-  = frac("Model Params", |X| |Y|).
+    + 2 frac(D, |X| |Y|) V 
+  &= frac(1, |X| |Y|) dot (L dot (3 D F + 4 D H N) + 2 D V) \
+  &= frac("Model Params", |X| |Y|).
 $
 
 For LLAMA2 13B we get:
@@ -247,52 +244,45 @@ $
 
 Activation checkpoints will be sharded with shapes:
 
-```text
-[B_X, T, F_Y]
-[B_X, T, F_Y]
+$
+[B_X, T, F_Y] quad
+[B_X, T, F_Y] quad
 [B_X, T, D_Y]
-```
+$
 
 so we get:
 
 $
   "Checkpoints per device"
-    = L dot (2 frac(B, |X|) dot T frac(D, |Y|)
-      + 4 frac(B, |X|) T frac(F, |Y|)) " Bytes" \
-    = frac(1, |X| |Y|) dot (L dot (B T) dot (4 F + 2 D)) " Bytes".
+    &= L dot (2 frac(B, |X|) dot T frac(D, |Y|)
+      + 4 frac(B, |X|) T frac(F, |Y|)) "Bytes" \
+    &= frac(1, |X| |Y|) dot (L dot (B T) dot (4 F + 2 D)) "Bytes".
 $
 
 Let $B T = 3 dot 10^6$, then:
 
 $
-  frac(1, 16^3) dot (40 dot (3 dot 10^6) dot (4 dot 13824 + 2 dot 5120)) \
+  frac(1, 16^3) dot (40 dot (3 dot 10^6) dot (4 dot 13824 + 2 dot 5120))
   approx 1.9 "GB".
 $
 
 Therefore for memory used per device we get $approx 1.9 "GB"$.
 
 If we use FSDP and TP to minimize communications we need to set
-
 $
-  X_("opt") = sqrt(frac(B, F) dot frac(M_X, M_Y) dot N).
+  X_("opt") = sqrt(frac(B, F) dot frac(M_X, M_Y) dot N)
 $
 
 Let $N = 16^3$, $M_X = 2$, $M_Y = 1$, $B = 3 dot 10^6$, and $F = 13824$. Therefore:
 
 $
   X_("opt")
-    = sqrt(frac(3 dot 10^6, 13824) dot 2 dot 16^3) \
+    = sqrt(frac(3 dot 10^6, 13824) dot 2 dot 16^3)
     approx 1333.3 approx 1333.
 $
 
-Since $N = X_("opt") dot Y$:
-
-$
-  frac(16^3, 1333) = Y = 3.07.
-$
-
-to get integer values therefore we choose $X_("opt") = 1024$ and $Y = 4$, which is closer to our optimum.
-
+Since $N = X_("opt") dot Y => frac(16^3, 1333) = Y = 3.07.$
+To get integer values therefore we choose $X_("opt") = 1024$ and $Y = 4$, which is closer to our optimum.
 Having chosen this, we will be compute bound iff:
 
 $
@@ -304,8 +294,8 @@ where $alpha = frac(C, W_("ICI")) = 2550$ for v5p.
 Let $F = 13824$, $N = 16^3$, $M_X = 2$, $M_Y = 1$, and $B = 3 dot 10^6$:
 
 $
-  frac(B, N) = frac(3 dot 10^6, 16^3) approx 733 \
-  frac(alpha^2, M_X M_Y dot F) = frac((2550)^2, 2 dot 13824) = 235.
+  frac(B, N) &= frac(3 dot 10^6, 16^3) approx 733 \
+  frac(alpha^2, M_X M_Y dot F) &= frac((2550)^2, 2 dot 13824) = 235.
 $
 
 therefore we are compute bound.
@@ -314,8 +304,8 @@ Assuming we are compute bound, using only roofline FLOPs estimates and ignoring 
 
 $
   "Time per Step"
-    = frac(3 e 6 dot 13 e 9 dot 6, 16^3 dot (0.4 dot 4.59 e 14)) \
-    = 0.312 "s" \
+    = frac(3 e 6 dot 13 e 9 dot 6, 16^3 dot (0.4 dot 4.59 e 14))
+    = 0.312 "s"
     = 312 "ms".
 $
 
