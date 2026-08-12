@@ -13,29 +13,27 @@ Remark: The following questions don't appear numbered in the scaling book. I wil
 
 === Exercise statement
 
-How many FLOPs does LLaMA-3 perform per token per training step? This helps us determine how expensive the whole training process will be.
+How many FLOPs does LLaMA-3 perform per token per training step ? This helps us determine how expensive the whole training process will be.
 
 === Solution
 
 Scan pages: 1.
 
 Let $M = 70.4 e 9$. We know that
-
 $
   "Transformer FLOPs" approx 6 dot B T dot M.
 $
 
-Therefore per token we know its GMFLOPs:
-
+Therefore per token we know its:
 $
-  6 M "FLOPs" = 422.4 e 9.
+  frac(6 dot B T dot M, B T) = 6 dot M "FLOPs" = 422.4 e 9 "FLOPs".
 $
 
 == Exercise 0.2 -- Total FLOPs for 15T tokens
 
 === Exercise statement
 
-LLaMA 3 was trained for about 15 trillion tokens. How many FLOPs is that total?
+LLaMA 3 was trained for about 15 trillion tokens. How many FLOPs is that total ?
 
 === Solution
 
@@ -45,10 +43,10 @@ Let $M = 70.4 e 9$ and $B T = 15 e 12$, hence:
 
 $
   "Transformer FLOPs" = 6 dot B T dot M
-    = (6 dot 70.4 dot 15) dot 10^21
-    = 6336 dot 10^21
-    approx 6.3 e 24
-    = 6.3 "Yotta FLOPs".
+    &= (6 dot 70.4 dot 15) dot 10^21 \
+    &= 6336 dot 10^21 \
+    &approx 6.3 e 24 \
+    &= 6.3 "Yotta FLOPs".
 $
 
 == Exercise 0.3 -- Training time on a full TPU v5p pod
@@ -63,14 +61,12 @@ Scan pages: 2.
 
 Assume TPU v5p pod of $16 times 20 times 28 = 8960$ chips. Let v5p bf16 FLOPs/s $= 4.59 e 14$.
 
-We know that FLOPs per chip is
-
+We know that FLOPs per chip is:
 $
-  frac(1, 8960) dot 6 dot B T dot M.
+frac(1, 8960) dot 6 dot B T dot M.
 $
 
-Let $M = 70.4 e 9$ and $B T = 15 e 12$. Therefore
-
+Let $M = 70.4 e 9$ and $B T = 15 e 12$. Therefore:
 $
   "Time" = frac(6 dot B T dot M, 8960 dot 0.4 dot 4.59 e 14)
     = 44.3 "days".
@@ -87,35 +83,25 @@ LLaMA 3-70B was pretrained with a batch size of about 4M tokens. How many TPUs d
 Scan pages: 2--3.
 
 Assume we checkpoint the three big matmuls in the MLP part and
-
-$
-  A = "softmax"(Q dot K^T) dot V,
-$
-
+$A = "softmax"(Q dot K^T) dot V$,
 which has shape $A[B, T, K, G, H]$, so it occupies $2 dot B T K G H = 2 B T D$.
-
 Hence, combining our formula from exercise 5.2, we get that:
-
 $
   "Activation Checkpointing" = L dot (4 B T F + 4 B T D).
 $
 
 Therefore total memory required is:
-
 $
-  10 dot M + L dot (B T) dot (4F + 4D),
+  10 dot M + L dot (B T) dot (4F + 4D)
 $
-
 where $M$ is number of model parameters. Let $B T = 4 e 6$. Therefore for LLaMA 3-70B we get:
-
 $
   10 dot (70.4 e 9) + 80 dot (4 e 6) dot (4 dot 28672 + 4 dot 8192)
   approx 47.8 e 12
   = 47.8 "TB".
 $
 
-So assuming v5p TPU which has HBM capacity $= 96 "GB"$, we need at least:
-
+So assuming v5p TPU which has $"HBM Capacity" = 96 "GB"$, we need at least:
 $
   frac(47.8 e 12, 96 e 9) approx 498
 $
@@ -126,7 +112,7 @@ TPUs.
 
 === Exercise statement
 
-Under the same assumptions as the question above, if we use 8960 TPU v5p chips, how much memory will we use per-chip?
+Under the same assumptions as the question above, if we use 8960 TPU v5p chips, how much memory will we use per-chip ?
 
 === Solution
 
@@ -142,45 +128,34 @@ $
 
 === Exercise statement
 
-Under the assumptions above, can we train our model with FSDP alone? To start, let's say we can't do any sequence/context parallelism. This should be the first idea you have, since it's simple and will introduce no extra communication if it works.
+Under the assumptions above, can we train our model with FSDP alone ? To start, let's say we can't do any sequence/context parallelism. This should be the first idea you have, since it's simple and will introduce no extra communication if it works.
 
 === Solution
 
 Scan pages: 4--6.
 
 Modeling only the MLP part and using sharding strategy from [sequence parallelism, Shenggui Li et al.], both FSDP and sequence parallelism perform:
-
 $
   "In"[B_X, L_Y, D] dot_D W_("in")[D_X, F] dot_F W_("out")[F, D_X].
 $
-
 So without sequence parallelism we get:
-
 $
   "In"[B_X, L, D] dot_D W_("in")[D_X, F] dot_F W_("out")[F, D_X].
 $
-
 Hence:
-
 $
-  T_("math") = frac(2 dot 2 dot B dot L dot D dot F, X dot C) \
-  T_("comms") = frac(2 dot 2 dot D dot F, W_("ICI"))
+  T_("math") &= frac(2 dot 2 dot B dot L dot D dot F, X dot C) \
+  T_("comms") &= frac(2 dot 2 dot D dot F, W_("ICI"))
 $
-
 Therefore for being compute bound in this setting we need:
 
 $
-  frac(4 B L D F, 4 X D F) > 2550
-    <=> frac(B L, X) > 2550 \
-  => frac(B, X) > frac(2550, L).
+  frac(4 B L D F, 4 X D F) > 2550 <=> frac(B L, X) > 2550  <=> frac(B, X) > frac(2550, L).
 $
-
 From the exercise we know that $L = 4096$, therefore:
-
 $
   frac(B, X) > 0.62.
 $
-
 Since $frac(B, X) = 0.11$, we cannot train with FSDP alone.
 
 == Exercise 0.7 -- FSDP with sequence/context parallelism
@@ -217,12 +192,7 @@ $
   frac(B dot L, X) > 2550.
 $
 
-Since
-
-$
-  frac(1024 dot 4096, 8960) approx 468,
-$
-
+Since $frac(1024 dot 4096, 8960) approx 468$
 we cannot use FSDP if we want to be compute bound.
 
 == Exercise 0.8 -- Mixed tensor parallelism and FSDP
@@ -235,24 +205,9 @@ Now let's look at mixed tensor parallelism and FSDP. Does there exist some combi
 
 Scan pages: 7.
 
-We require
-
-$
-  frac(B dot L, N) > frac(alpha^2, M_x M_y dot F)
-$
-
-and $X$ to be
-
-$
-  X_("opt") = sqrt(frac(B dot L, F) dot frac(M_x, M_y) dot N),
-$
-
-to be compute bound. Since $frac(B L, N) approx 468$ and
-
-$
-  frac(alpha^2, M_x M_y dot F) approx 113,
-$
-
+We require $frac(B dot L, N) > frac(alpha^2, M_x M_y dot F)$
+and $X$ to be $X_("opt") = sqrt(frac(B dot L, F) dot frac(M_x, M_y) dot N)$,
+to be compute bound. Since $frac(B L, N) approx 468$ and $frac(alpha^2, M_x M_y dot F) approx 113$,
 if we choose $X = 2240$, since is close to our $X_("opt")$, we will be compute bound.
 
 == Exercise 1 -- Scaling LLaMA 70B to more chips
