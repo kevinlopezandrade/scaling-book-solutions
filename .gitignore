@@ -24,7 +24,13 @@ npm-debug.log*
 !.env.example
 .envrc
 
-# Generated website and browser-test artifacts
+# Local reference checkout and scratch files
+/scaling-book/
+/tmp/
+/Notes
+/email
+
+# Generated website and local preview artifacts
 /web/dist/
 /web/.artifacts/
 

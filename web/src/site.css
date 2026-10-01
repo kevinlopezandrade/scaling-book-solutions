@@ -1,0 +1,66 @@
+.home {
+  width: min(42rem, calc(100% - 2rem));
+  margin: 3rem auto;
+}
+
+.site-shell {
+  display: grid;
+  grid-template-columns: minmax(10rem, 14rem) minmax(0, 42rem);
+  column-gap: 3rem;
+  align-items: start;
+  width: min(60rem, calc(100% - 2rem));
+  margin: 2rem auto;
+}
+
+.site-shell > main {
+  grid-column: 2;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.toc {
+  grid-column: 1;
+  min-width: 0;
+}
+
+.chapter {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.chapter math[display="block"],
+.chapter :is(p, li):has(math) {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.chapter img {
+  max-width: 100%;
+  height: auto;
+}
+
+.typst-align[data-alignment="center"] > img {
+  margin-inline: auto;
+}
+
+.chapter pre,
+.chapter table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.chapter h3[id] {
+  scroll-margin-top: 1rem;
+}
+
+@media (max-width: 48rem) {
+  .site-shell {
+    display: block;
+    margin: 1rem auto;
+  }
+
+  .toc {
+    margin-bottom: 3rem;
+  }
+}
