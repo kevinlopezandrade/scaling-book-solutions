@@ -3,9 +3,8 @@
 
 = Scaling Book Exercises -- Chapter 8
 
-Chapter: 8 -- Serving LLaMA 3 on TPUs\
-Source: handwritten Onyx Boox A4 PDF\
-Note: Transcribed from handwritten solutions; book markdown used only for exercise statements and notation.
+Transcribed from handwritten solutions.
+#link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-8/c8-handwritten.pdf")[Source]
 
 *Remark:* The following questions don't appear numbered in the Scaling Book. I will number them in order of appearance as 0.X, where $X in NN$ and $X >= 1$.
 

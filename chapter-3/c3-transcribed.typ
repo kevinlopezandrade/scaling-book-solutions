@@ -3,9 +3,8 @@
 
 = Scaling Book Exercises -- Chapter 3
 
-Chapter: 3 -- Sharded Matrices and How to Multiply Them\
-Source: handwritten Onyx Boox A4 PDF\
-Note: Transcribed from handwritten solutions; book markdown used only for exercise statements and notation.
+Transcribed from handwritten solutions.
+#link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-3/c3-handwritten.pdf")[Source]
 
 == Exercise 1 -- replicated sharding
 

@@ -3,9 +3,8 @@
 
 = Scaling Book Exercises — Chapter 2
 
-Chapter: 2 — How to Think About TPUs\
-Source: handwritten Onyx Boox A4 PDF\
-Note: Transcribed from handwritten solutions; book markdown used only for exercise statements and notation.
+Transcribed from handwritten solutions.
+#link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-2/c2-handwritten.pdf")[Source]
 
 This document contains only the handwritten solution content from the scan, with exercise statements copied from the Chapter 2 book markdown and kept separate from the solutions.
 

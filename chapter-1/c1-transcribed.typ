@@ -3,9 +3,8 @@
 
 = Scaling Book Exercises -- Chapter 1
 
-Chapter: 1 -- All About Rooflines\
-Source: handwritten Onyx Boox A4 PDF\
-Note: Transcribed from handwritten solutions; book markdown used only for exercise statements and notation.
+Transcribed from handwritten solutions.
+#link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-1/c1-handwritten.pdf")[Source]
 
 == Exercise 1 -- int8 matmul
 

@@ -3,9 +3,8 @@
 
 = Scaling Book Exercises -- Chapter 7
 
-Chapter: 7 -- All About Transformer Inference\
-Source: handwritten Onyx Boox A4 PDF\
-Note: Transcribed from handwritten solutions; book markdown used only for exercise statements and notation.
+Transcribed from handwritten solutions.
+#link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-7/c7-handwritten.pdf")[Source]
 
 == Shared model setup for Exercises 1-7
 

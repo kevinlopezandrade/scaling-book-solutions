@@ -3,9 +3,8 @@
 
 = Scaling Book Exercises -- Chapter 4
 
-Chapter: 4 -- All the Transformer Math You Need to Know\
-Source: handwritten Onyx Boox A4 PDF\
-Note: Transcribed from handwritten solutions; book markdown used only for exercise statements and notation.
+Transcribed from handwritten solutions.
+#link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-4/c4-handwritten.pdf")[Source]
 
 == Exercise 1 -- Parameter count, attention fraction, and KV cache
 

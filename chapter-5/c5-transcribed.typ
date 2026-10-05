@@ -3,9 +3,8 @@
 
 = Scaling Book Exercises -- Chapter 5
 
-Chapter: 5 -- How to Parallelize a Transformer for Training\
-Source: handwritten Onyx Boox A4 PDF\
-Note: Transcribed from handwritten solutions; book markdown used only for exercise statements and notation.
+Transcribed from handwritten solutions.
+#link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-5/c5-handwritten.pdf")[Source]
 
 == Shared setup from the book
 

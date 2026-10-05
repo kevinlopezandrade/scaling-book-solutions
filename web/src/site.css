@@ -151,14 +151,7 @@ a:hover {
   margin-bottom: 1.45rem;
 }
 
-/* Typst emits the chapter title as h2, exercises as h3, subsections as h4. */
-.post-content h2 {
-  font-size: 30px;
-  font-weight: 600;
-  line-height: 1.4;
-  margin: 2.8rem 0 1rem;
-}
-
+/* Typst emits exercises as h3 and their subsections as h4. */
 .post-content h3 {
   font-size: 1.45rem;
   font-weight: 600;

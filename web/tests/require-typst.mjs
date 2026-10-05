@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 
-const expectedVersion = "0.15.0";
+const expectedVersion = "0.15.1";
 const output = execFileSync("typst", ["--version"], { encoding: "utf8" }).trim();
 const [command, version] = output.split(" ");
 

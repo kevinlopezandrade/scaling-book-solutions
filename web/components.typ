@@ -9,6 +9,8 @@
 )
 
 #let transcription(source) = [
+  // The web page already supplies a chapter title; retain this one only in PDFs.
+  #show heading.where(level: 1): none
   // Preserve content while mapping layout primitives unsupported by HTML.
   #show align: html-align
   #include source
