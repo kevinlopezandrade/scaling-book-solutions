@@ -1,3 +1,16 @@
+/* Use the genuine Book face at normal weight, not synthetic bold math. */
+@font-face {
+  font-family: "New Computer Modern Math Book";
+  src: url("fonts/NewCMMath-Book.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+.transcription math {
+  font-family: "New Computer Modern Math Book", math;
+}
+
 /* Typst-specific image alignment and native MathML layout. */
 .typst-align[data-alignment="center"] > img {
   display: block;

@@ -10,6 +10,12 @@ const theme = new URL("assets/theme/", website);
 const origin = "https://site.invalid";
 const base = new URL("/posts/scaling-book-solutions/", origin);
 
+const mathFont = readFileSync(new URL("assets/fonts/NewCMMath-Book.woff2", dist));
+assert.equal(mathFont.subarray(0, 4).toString("ascii"), "wOF2", "Missing or invalid bundled math font.");
+for (const license of ["GUST-FONT-LICENSE.txt", "LPPL-1.3c.txt"]) {
+  assert(existsSync(new URL(`assets/fonts/${license}`, dist)), `Math font license is missing: ${license}`);
+}
+
 for (const file of JSON.parse(readFileSync(new URL("assets.json", theme), "utf8"))) {
   assert(existsSync(new URL(file, theme)), `Shared theme asset is missing: ${file}`);
 }
@@ -34,6 +40,10 @@ for (const route of ["index.html", ...chapters.map((chapter) => chapter.route)])
   if (route !== "index.html") {
     const sections = $("article h3").toArray();
     assert.equal($("merror").length, 0, `${route}: MathML contains an error.`);
+    const preload = $('link[rel="preload"][as="font"]');
+    assert.equal(preload.length, 1, `${route}: expected a math font preload.`);
+    assert.equal(preload.attr("href"), "../assets/fonts/NewCMMath-Book.woff2");
+    assert.equal(preload.attr("crossorigin"), "anonymous");
 
     assert.deepEqual(
       $(".toc nav a").map((_, link) => $(link).attr("href")).get(),
@@ -68,4 +78,4 @@ for (const route of ["index.html", ...chapters.map((chapter) => chapter.route)])
   }
 }
 
-console.log(`HTML checks passed for the homepage and ${chapters.length} chapters.`);
+console.log(`HTML and math-font checks passed for the homepage and ${chapters.length} chapters.`);

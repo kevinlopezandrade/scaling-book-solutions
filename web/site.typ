@@ -17,6 +17,9 @@
 
 #asset("assets/typst.css", read("src/typst.css", encoding: none))
 #asset("assets/favicon.svg", read("src/favicon.svg", encoding: none))
+#for file in ("NewCMMath-Book.woff2", "GUST-FONT-LICENSE.txt", "LPPL-1.3c.txt") {
+  asset("assets/fonts/" + file, read("src/fonts/" + file, encoding: none))
+}
 
 // Production uses the main website's theme. Preview serves those same files
 // locally and watches them for changes, alongside the chapter sources.

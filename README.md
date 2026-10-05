@@ -75,12 +75,20 @@ npm run verify
 
 The generated static site is written to `web/dist/`. A single Typst compilation
 emits the chapter index, eight chapter pages, a small Typst-specific stylesheet,
-and an SVG favicon. Chapter content is wrapped in a stable semantic article
-layout, and each table of contents is a document-scoped native Typst outline.
+a bundled math font and its licenses, and an SVG favicon. Chapter content is
+wrapped in a stable semantic article layout, and each table of contents is a
+document-scoped native Typst outline.
 A small shared script highlights the current section; the content itself is
 static HTML and native MathML.
 
-Production pages load the shared article CSS, fonts, and TOC script from
+Web equations use the self-hosted **New Computer Modern Math, Book** face for
+slightly heavier Computer Modern-style strokes. It is applied only to MathML
+through `web/src/typst.css`; chapter sources, prose fonts, and PDF styling are
+unchanged. No math-rendering JavaScript, font installation, or CDN is required.
+Font provenance, licensing, and conversion instructions are in
+`web/src/fonts/README.md`.
+
+Production pages load the shared article CSS, prose fonts, and TOC script from
 `/assets/theme/` at the domain root. The main website owns those files. Deploy
 them before deploying this build at `/posts/scaling-book-solutions/`. Do not
 publish the preview directory. `npm run build` works without the main website
@@ -94,6 +102,7 @@ The HTML check uses Cheerio to read HTML elements. It checks that:
 
 - The homepage lists every chapter directory in order, and every chapter page exists.
 - MathML contains no explicit error elements.
+- The local math web font, its licenses, and chapter font preloads are present.
 - Contents links cover the chapter sections, and element IDs are unique.
 - Local links, fragment targets, stylesheets, scripts, and image files exist,
   including references to the main website's shared article theme.
@@ -124,4 +133,5 @@ The web source is split by responsibility:
 - `web/site.typ` declares bundle documents and local assets, plus shared assets
   for previews only.
 - `web/src/typst.css` contains image-alignment and MathML adjustments.
+- `web/src/fonts/` contains the self-hosted math font and its licenses.
 - `../web/assets/theme/` owns the shared article CSS, fonts, and TOC script.

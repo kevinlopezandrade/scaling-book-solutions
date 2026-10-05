@@ -8,7 +8,7 @@
   Chapter #(chapter.number): #(chapter.title)
 ]
 
-#let page-head(title, assets, description: none) = [
+#let page-head(title, assets, description: none, math-font: false) = [
   #void("meta", attrs: (charset: "utf-8"))
   #void("meta", attrs: (
     name: "viewport",
@@ -25,6 +25,15 @@
   ))
   #void("link", attrs: (rel: "stylesheet", href: theme + "/article.css"))
   #void("link", attrs: (rel: "stylesheet", href: assets + "/typst.css"))
+  #if math-font {
+    void("link", attrs: (
+      rel: "preload",
+      href: assets + "/fonts/NewCMMath-Book.woff2",
+      "as": "font",
+      type: "font/woff2",
+      crossorigin: "anonymous",
+    ))
+  }
 ]
 
 #let site-header(home) = el("header", attrs: (class: "site-header"))[
@@ -91,6 +100,7 @@
     #page-head(
       document-title,
       "../assets",
+      math-font: true,
     )
   ]
   #el("body")[
