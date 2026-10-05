@@ -35,7 +35,6 @@
 ]
 
 #let site-header(home) = el("header", attrs: (class: "site-header"))[
-  #el("a", attrs: (class: "site-name", href: home))[Scaling Book]
   #el("nav", attrs: ("aria-label": "Site"))[
     #el("a", attrs: (href: home))[Chapters]
     #el("a", attrs: (
@@ -65,8 +64,10 @@
       #el("header", attrs: (class: "post-heading"))[#title()]
       #el("div", attrs: (class: "post-content"))[
         #el("p")[
-          Typst transcriptions of detailed solutions to the exercises in
-          #emph[How to Scale Your Model].
+          Typst transcriptions of my solutions to the exercises in
+          #el("a", attrs: (href: "https://jax-ml.github.io/scaling-book/"))[
+            #emph[How to Scale Your Model]
+          ]
         ]
         #el("nav", attrs: (
           class: "chapter-list",

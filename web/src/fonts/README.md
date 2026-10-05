@@ -9,4 +9,3 @@ Original font metadata is preserved. Source URLs:
 - `iowan-italic.woff2`: https://thinkingmachines.ai/fonts/iowan-old-style/iowan-old-style_italic.woff2
 - `iowan-bold.woff2`: https://thinkingmachines.ai/fonts/iowan-old-style/iowan-old-style_bold.woff2
 - `gt-america-regular.woff2`: https://thinkingmachines.ai/fonts/gt-america/GT-America-Standard-Regular.woff2
-- `chakra-petch-medium.woff2`: https://thinkingmachines.ai/fonts/chakra-petch/chakra-petch-v12-latin-500.woff2

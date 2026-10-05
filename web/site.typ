@@ -24,7 +24,6 @@
   "iowan-italic",
   "iowan-bold",
   "gt-america-regular",
-  "chakra-petch-medium",
 ) {
   asset(
     "assets/fonts/" + font + ".woff2",
