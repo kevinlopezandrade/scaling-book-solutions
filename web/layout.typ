@@ -2,6 +2,7 @@
 
 #let site-title = [Scaling Book Solutions]
 #let site-description = "Detailed Typst transcriptions of worked scaling book exercises."
+#let theme = "/assets/theme"
 
 #let chapter-document-title(chapter) = [
   Chapter #(chapter.number): #(chapter.title)
@@ -22,16 +23,8 @@
     href: assets + "/favicon.svg",
     type: "image/svg+xml",
   ))
-  #void("link", attrs: (rel: "stylesheet", href: assets + "/site.css"))
-  #for font in ("iowan-regular", "iowan-bold", "gt-america-regular") {
-    void("link", attrs: (
-      rel: "preload",
-      href: assets + "/fonts/" + font + ".woff2",
-      "as": "font",
-      type: "font/woff2",
-      crossorigin: "",
-    ))
-  }
+  #void("link", attrs: (rel: "stylesheet", href: theme + "/article.css"))
+  #void("link", attrs: (rel: "stylesheet", href: assets + "/typst.css"))
 ]
 
 #let site-header(home) = el("header", attrs: (class: "site-header"))[
@@ -116,6 +109,6 @@
         #el("a", attrs: (href: "#top"))[Back to top ↑]
       ]
     ]
-    #el("script", attrs: (src: "../assets/toc.js", defer: ""))[]
+    #el("script", attrs: (src: theme + "/toc.js", type: "module"))[]
   ]
 ]

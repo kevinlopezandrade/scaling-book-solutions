@@ -5,7 +5,13 @@ import { load } from "cheerio";
 import { chapters } from "./helpers.mjs";
 
 const dist = new URL("../dist/", import.meta.url);
+const theme = new URL("../../../web/assets/theme/", import.meta.url);
 const origin = "https://site.invalid";
+const base = new URL("/posts/scaling-book-solutions/", origin);
+
+for (const file of JSON.parse(readFileSync(new URL("assets.json", theme), "utf8"))) {
+  assert(existsSync(new URL(file, theme)), `Shared theme asset is missing: ${file}`);
+}
 
 function readPage(url) {
   return load(readFileSync(url, "utf8"));
@@ -35,16 +41,20 @@ for (const route of ["index.html", ...chapters.map((chapter) => chapter.route)])
     );
   }
 
-  // Resolve local references as website URLs, then check the files in dist.
+  // Resolve deployed URLs against either this build or the shared article theme.
   for (const element of $("a[href], link[href], img[src], script[src]").toArray()) {
     const value = $(element).attr("href") ?? $(element).attr("src");
     assert(value.trim(), `${route}: empty link or asset URL.`);
-    const target = new URL(value, `${origin}/${route}`);
+    const target = new URL(value, new URL(route, base));
     if (target.origin !== origin) continue;
     if (target.pathname.endsWith("/")) target.pathname += "index.html";
 
-    const file = new URL(`.${target.pathname}`, dist);
-    assert(file.href.startsWith(dist.href), `${route}: reference escapes dist: ${value}`);
+    const shared = target.pathname.startsWith("/assets/theme/");
+    const root = shared ? theme : dist;
+    const prefix = shared ? "/assets/theme/" : base.pathname;
+    assert(target.pathname.startsWith(prefix), `${route}: unexpected local URL: ${value}`);
+    const file = new URL(target.pathname.slice(prefix.length), root);
+    assert(file.href.startsWith(root.href), `${route}: reference escapes its directory: ${value}`);
     assert(existsSync(file), `${route}: missing local file: ${value}`);
 
     if (target.hash) {

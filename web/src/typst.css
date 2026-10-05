@@ -1,0 +1,21 @@
+/* Typst-specific image alignment and native MathML layout. */
+.typst-align[data-alignment="center"] > img {
+  display: block;
+  margin-inline: auto;
+}
+
+/* Keep long equations scrollable, with room for tall fractions and accents. */
+.transcription math[display="block"] {
+  margin-block: 1.4rem;
+  padding-block: 0.95rem;
+}
+
+.transcription math[display="block"],
+.transcription :is(p, li):has(math) {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.transcription li:has(math) {
+  list-style-position: inside;
+}

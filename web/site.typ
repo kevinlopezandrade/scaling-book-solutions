@@ -15,18 +15,17 @@
   )
 }
 
-#asset("assets/site.css", read("src/site.css", encoding: none))
-#asset("assets/toc.js", read("src/toc.js", encoding: none))
+#asset("assets/typst.css", read("src/typst.css", encoding: none))
 #asset("assets/favicon.svg", read("src/favicon.svg", encoding: none))
 
-#for font in (
-  "iowan-regular",
-  "iowan-italic",
-  "iowan-bold",
-  "gt-america-regular",
-) {
-  asset(
-    "assets/fonts/" + font + ".woff2",
-    read("src/fonts/" + font + ".woff2", encoding: none),
-  )
+// Production uses the main website's theme. Preview serves those same files
+// locally and watches them for changes, alongside the chapter sources.
+#if sys.inputs.at("preview", default: "false") == "true" {
+  let theme = "../../web/assets/theme/"
+  for file in json(theme + "assets.json") {
+    asset(
+      "assets/theme/" + file,
+      read(theme + file, encoding: none),
+    )
+  }
 }

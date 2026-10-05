@@ -6,7 +6,7 @@
     "prebuild": "node tests/require-typst.mjs",
     "build": "rm -rf dist && typst compile --features bundle,html --format bundle --root .. --pretty site.typ dist",
     "predev": "node tests/require-typst.mjs",
-    "dev": "typst watch --features bundle,html --format bundle --root .. --pretty --port 4173 site.typ dist",
+    "dev": "typst watch --features bundle,html --format bundle --root ../.. --input preview=true --pretty --port 4173 site.typ .artifacts/preview",
     "check": "node tests/smoke.mjs",
     "precheck:pdf": "node tests/require-typst.mjs",
     "check:pdf": "node tests/pdf.mjs",
