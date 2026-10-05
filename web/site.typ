@@ -16,4 +16,18 @@
 }
 
 #asset("assets/site.css", read("src/site.css", encoding: none))
+#asset("assets/toc.js", read("src/toc.js", encoding: none))
 #asset("assets/favicon.svg", read("src/favicon.svg", encoding: none))
+
+#for font in (
+  "iowan-regular",
+  "iowan-italic",
+  "iowan-bold",
+  "gt-america-regular",
+  "chakra-petch-medium",
+) {
+  asset(
+    "assets/fonts/" + font + ".woff2",
+    read("src/fonts/" + font + ".woff2", encoding: none),
+  )
+}

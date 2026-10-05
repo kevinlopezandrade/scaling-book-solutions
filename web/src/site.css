@@ -1,66 +1,372 @@
-.home {
-  width: min(42rem, calc(100% - 2rem));
-  margin: 3rem auto;
+/* Article typography and layout from thinkingmachines.ai/blog/modular-manifolds/. */
+@font-face {
+  font-family: "Iowan Old Style BT";
+  src: url("fonts/iowan-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
-.site-shell {
+@font-face {
+  font-family: "Iowan Old Style BT";
+  src: url("fonts/iowan-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Iowan Old Style BT";
+  src: url("fonts/iowan-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "GT America";
+  src: url("fonts/gt-america-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Chakra Petch";
+  src: url("fonts/chakra-petch-medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --text: #282828;
+  --muted: #676767;
+  --font-serif: "Iowan Old Style BT", Georgia, serif;
+  --font-sans: "GT America", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --content-width: 660px;
+  --header-height: 54px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Reset HTML elements only, preserving native MathML spacing. */
+:where(body, h1, h2, h3, h4, h5, h6, p, ol, ul, figure, blockquote) {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  overflow-y: scroll;
+  scroll-padding-top: calc(var(--header-height) + 1rem);
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted) white;
+}
+
+body {
+  padding: var(--header-height) 1rem 0;
+  background: white;
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-size: 17px;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+
+a {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: #504945;
+  text-decoration: underline;
+  text-decoration-color: #6767674d;
+  text-underline-offset: 2px;
+}
+
+.site-header {
+  position: fixed;
+  inset: 0 1rem auto;
+  z-index: 2;
+  height: var(--header-height);
+  padding-inline: 0.33rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+}
+
+.site-name {
+  font-family: "Chakra Petch", var(--font-sans);
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 1.7px;
+  text-transform: uppercase;
+}
+
+.site-header nav {
+  display: flex;
+  gap: 1.75rem;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+
+.site-header nav a {
+  color: #3c3836;
+}
+
+.post {
+  width: 100%;
+  max-width: 950px;
+  margin-inline: auto;
+  padding: 1rem 1rem 4rem;
+}
+
+.post-heading {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.post-heading h1 {
+  max-width: 710px;
+  margin: 1.5rem auto 0;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-wrap: balance;
+}
+
+.post-meta {
+  margin-top: 1rem;
+  color: #6b6866;
+  font: 15px/21px var(--font-sans);
+  letter-spacing: 0.24px;
+}
+
+.post-body {
   display: grid;
-  grid-template-columns: minmax(10rem, 14rem) minmax(0, 42rem);
-  column-gap: 3rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, var(--content-width)) minmax(0, 1fr);
   align-items: start;
-  width: min(60rem, calc(100% - 2rem));
-  margin: 2rem auto;
 }
 
-.site-shell > main {
+.post-content {
   grid-column: 2;
+  width: 100%;
   min-width: 0;
-  max-width: 100%;
+  max-width: var(--content-width);
+  margin-inline: auto;
+  padding-top: 0.5rem;
 }
 
-.toc {
-  grid-column: 1;
-  min-width: 0;
+.post-content p {
+  margin-bottom: 1.45rem;
 }
 
-.chapter {
-  min-width: 0;
-  max-width: 100%;
+/* Typst emits the chapter title as h2, exercises as h3, subsections as h4. */
+.post-content h2 {
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 2.8rem 0 1rem;
 }
 
-.chapter math[display="block"],
-.chapter :is(p, li):has(math) {
+.post-content h3 {
+  font-size: 1.45rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 1.25em 0 0.6em;
+}
+
+.post-content h4 {
+  font-size: 1.35rem;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.4;
+  margin: 1.4em 0 0.5em;
+}
+
+.post-content h5 {
+  font-size: 0.97rem;
+  font-weight: 400;
+  font-style: italic;
+  margin: 1.4em 0 0.7em;
+}
+
+.post-content > :first-child {
+  margin-top: 0;
+}
+
+.post-content a {
+  text-decoration: underline;
+  text-decoration-color: #6767674d;
+}
+
+.post-content :is(ol, ul) {
+  margin: 1rem 0 1.2rem 2rem;
+}
+
+.post-content ul {
+  margin-left: 1.5rem;
+  list-style: square;
+}
+
+.post-content ol ol {
+  list-style-type: lower-alpha;
+}
+
+.post-content li {
+  margin-bottom: 0.2rem;
+}
+
+.post-content li > p:last-child {
+  margin-bottom: 0;
+}
+
+.post-content code {
+  color: #ad2111;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 0.9em;
+  padding-inline: 0.2rem;
+}
+
+.post-content pre {
+  margin-block: 1.4rem;
+  padding: 1rem;
+  background: #f3f3f2;
+  border-radius: 0.45rem;
   max-width: 100%;
   overflow-x: auto;
-  overflow-y: hidden;
 }
 
-.chapter img {
+.post-content pre code {
+  color: #6b6866;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.post-content img {
   max-width: 100%;
   height: auto;
 }
 
 .typst-align[data-alignment="center"] > img {
+  display: block;
   margin-inline: auto;
 }
 
-.chapter pre,
-.chapter table {
+.post-content table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin-block: 1.333rem;
+  font-family: var(--font-sans);
+}
+
+.post-content :is(th, td) {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border: 0;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.post-content th {
+  color: #6b6866;
+  font-weight: 400;
+}
+
+/* Keep long equations scrollable, with room for tall fractions and accents. */
+.transcription math[display="block"] {
+  margin-block: 1.4rem;
+  padding-block: 0.95rem;
+}
+
+.transcription math[display="block"],
+.transcription :is(p, li):has(math) {
   max-width: 100%;
   overflow-x: auto;
 }
 
-.chapter h3[id] {
-  scroll-margin-top: 1rem;
+.transcription li:has(math) {
+  list-style-position: inside;
 }
 
-@media (max-width: 48rem) {
-  .site-shell {
-    display: block;
-    margin: 1rem auto;
-  }
+.toc {
+  grid-column: 1;
+  justify-self: end;
+  position: sticky;
+  top: calc(var(--header-height) + 2rem);
+  width: calc(210px + 1.3rem);
+  max-height: calc(100dvh - var(--header-height) - 3rem);
+  margin-right: 34px;
+  padding-left: 1.3rem;
+  transform: translateY(10px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  font: 13px/1.4 var(--font-sans);
+}
 
-  .toc {
-    margin-bottom: 3rem;
+.toc ol {
+  list-style: none;
+}
+
+.toc li {
+  margin-bottom: 0.7rem;
+}
+
+.toc a[aria-current="location"] {
+  color: var(--text);
+}
+
+.toc-marker {
+  position: absolute;
+  top: 0;
+  left: calc((1.3rem - 4px) / 2 - 0.05rem);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text);
+  opacity: 0;
+  transform: translateY(calc(var(--toc-marker-y, 0px) - 50%));
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.16s;
+}
+
+.toc:has([aria-current]) .toc-marker {
+  opacity: 1;
+}
+
+.post-footer {
+  display: flex;
+  justify-content: space-between;
+  max-width: var(--content-width);
+  margin: 3.5rem auto 0;
+  font: 15px/1.4 var(--font-sans);
+}
+
+@media (max-width: 1279px) {
+  .post {
+    max-width: 100%;
+    padding-inline: 1.3rem;
   }
+  .post-body { display: block; }
+  .toc { display: none; }
+}
+
+@media (max-width: 768px) {
+  :root { --header-height: 50px; }
+  body { padding-inline: 0.33rem; }
+  .site-header {
+    inset-inline: 0;
+    padding-inline: 1rem;
+  }
+  .site-header nav { gap: 1.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a, .toc-marker { transition: none; }
 }

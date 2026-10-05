@@ -7,7 +7,7 @@
   Chapter #(chapter.number): #(chapter.title)
 ]
 
-#let page-head(title, stylesheet, favicon, description: none) = [
+#let page-head(title, assets, description: none) = [
   #void("meta", attrs: (charset: "utf-8"))
   #void("meta", attrs: (
     name: "viewport",
@@ -19,79 +19,102 @@
   #el("title")[#title]
   #void("link", attrs: (
     rel: "icon",
-    href: favicon,
+    href: assets + "/favicon.svg",
     type: "image/svg+xml",
   ))
-  #void("link", attrs: (rel: "stylesheet", href: stylesheet))
+  #void("link", attrs: (rel: "stylesheet", href: assets + "/site.css"))
+  #for font in ("iowan-regular", "iowan-bold", "gt-america-regular") {
+    void("link", attrs: (
+      rel: "preload",
+      href: assets + "/fonts/" + font + ".woff2",
+      "as": "font",
+      type: "font/woff2",
+      crossorigin: "",
+    ))
+  }
 ]
 
-#let table-of-contents(document-title) = el(
-  "aside",
-  attrs: (class: "toc"),
-)[
-  #el("a", attrs: (href: "../index.html"))[All chapters]
-  #outline(
-    title: [Contents],
-    target: selector(heading.where(level: 2)).within(
-      document.where(title: document-title),
-    ),
-  )
+#let site-header(home) = el("header", attrs: (class: "site-header"))[
+  #el("a", attrs: (class: "site-name", href: home))[Scaling Book]
+  #el("nav", attrs: ("aria-label": "Site"))[
+    #el("a", attrs: (href: home))[Chapters]
+    #el("a", attrs: (
+      href: "https://github.com/kevinlopezandrade/scaling-book-solutions",
+    ))[Code]
+  ]
 ]
+
+#let table-of-contents(document-title) = outline(
+  title: none,
+  target: selector(heading.where(level: 2)).within(
+    document.where(title: document-title),
+  ),
+)
 
 #let home-page(chapters) = el("html", attrs: (lang: "en"))[
   #el("head")[
     #page-head(
       site-title,
-      "assets/site.css",
-      "assets/favicon.svg",
+      "assets",
       description: site-description,
     )
   ]
   #el("body")[
-    #el("main", attrs: (class: "home"))[
-      #title()
-      #el("p")[
-        Typst transcriptions of detailed solutions to the exercises in
-        #emph[How to Scale Your Model].
-      ]
-      #el("nav", attrs: (
-        class: "chapter-list",
-        "aria-label": "Chapters",
-      ))[
-        #el("ol")[
-          #for chapter in chapters {
-            el("li")[
-              #el("a", attrs: (href: chapter.output))[
-                Chapter #(chapter.number): #(chapter.title)
+    #site-header("index.html")
+    #el("main", attrs: (class: "post"))[
+      #el("header", attrs: (class: "post-heading"))[#title()]
+      #el("div", attrs: (class: "post-content"))[
+        #el("p")[
+          Typst transcriptions of detailed solutions to the exercises in
+          #emph[How to Scale Your Model].
+        ]
+        #el("nav", attrs: (
+          class: "chapter-list",
+          "aria-label": "Chapters",
+        ))[
+          #el("ol")[
+            #for chapter in chapters {
+              el("li")[
+                #el("a", attrs: (href: chapter.output))[
+                  Chapter #(chapter.number): #(chapter.title)
+                ]
               ]
-            ]
-          }
+            }
+          ]
         ]
       ]
     ]
   ]
 ]
 
-#let chapter-page(chapter, document-title) = el(
-  "html",
-  attrs: (lang: "en"),
-)[
+#let chapter-page(chapter, document-title) = el("html", attrs: (lang: "en"))[
   #el("head")[
     #page-head(
       document-title,
-      "../assets/site.css",
-      "../assets/favicon.svg",
+      "../assets",
     )
   ]
   #el("body")[
-    #el("div", attrs: (class: "site-shell"))[
-      #table-of-contents(document-title)
-      #el("main")[
-        #el("article", attrs: (class: "chapter"))[
-          #title()
+    #site-header("../index.html")
+    #el("main", attrs: (class: "post", id: "top"))[
+      #el("header", attrs: (class: "post-heading"))[
+        #title()
+        #el("p", attrs: (class: "post-meta"))[Worked solutions]
+      ]
+      #el("div", attrs: (class: "post-body"))[
+        #el("aside", attrs: (class: "toc", "aria-label": "On this page"))[
+          #el("span", attrs: (class: "toc-marker", "aria-hidden": "true"))[]
+          #table-of-contents(document-title)
+        ]
+        #el("article", attrs: (class: "post-content transcription"))[
           #transcription(chapter.source)
         ]
       ]
+      #el("footer", attrs: (class: "post-footer"))[
+        #el("a", attrs: (href: "../index.html"))[All chapters]
+        #el("a", attrs: (href: "#top"))[Back to top ↑]
+      ]
     ]
+    #el("script", attrs: (src: "../assets/toc.js", defer: ""))[]
   ]
 ]

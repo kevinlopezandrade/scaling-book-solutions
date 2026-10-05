@@ -36,7 +36,7 @@ for (const route of ["index.html", ...chapters.map((chapter) => chapter.route)])
   }
 
   // Resolve local references as website URLs, then check the files in dist.
-  for (const element of $("a[href], link[href], img[src]").toArray()) {
+  for (const element of $("a[href], link[href], img[src], script[src]").toArray()) {
     const value = $(element).attr("href") ?? $(element).attr("src");
     assert(value.trim(), `${route}: empty link or asset URL.`);
     const target = new URL(value, `${origin}/${route}`);
