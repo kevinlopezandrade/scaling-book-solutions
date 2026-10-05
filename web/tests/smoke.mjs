@@ -5,7 +5,8 @@ import { load } from "cheerio";
 import { chapters } from "./helpers.mjs";
 
 const dist = new URL("../dist/", import.meta.url);
-const theme = new URL("../../../web/assets/theme/", import.meta.url);
+const website = new URL("../../../web/", import.meta.url);
+const theme = new URL("assets/theme/", website);
 const origin = "https://site.invalid";
 const base = new URL("/posts/scaling-book-solutions/", origin);
 
@@ -41,7 +42,7 @@ for (const route of ["index.html", ...chapters.map((chapter) => chapter.route)])
     );
   }
 
-  // Resolve deployed URLs against either this build or the shared article theme.
+  // Resolve deployed URLs against either this build or the main website.
   for (const element of $("a[href], link[href], img[src], script[src]").toArray()) {
     const value = $(element).attr("href") ?? $(element).attr("src");
     assert(value.trim(), `${route}: empty link or asset URL.`);
@@ -49,10 +50,9 @@ for (const route of ["index.html", ...chapters.map((chapter) => chapter.route)])
     if (target.origin !== origin) continue;
     if (target.pathname.endsWith("/")) target.pathname += "index.html";
 
-    const shared = target.pathname.startsWith("/assets/theme/");
-    const root = shared ? theme : dist;
-    const prefix = shared ? "/assets/theme/" : base.pathname;
-    assert(target.pathname.startsWith(prefix), `${route}: unexpected local URL: ${value}`);
+    const project = target.pathname.startsWith(base.pathname);
+    const root = project ? dist : website;
+    const prefix = project ? base.pathname : "/";
     const file = new URL(target.pathname.slice(prefix.length), root);
     assert(file.href.startsWith(root.href), `${route}: reference escapes its directory: ${value}`);
     assert(existsSync(file), `${route}: missing local file: ${value}`);

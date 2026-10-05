@@ -29,6 +29,11 @@
 
 #let site-header(home) = el("header", attrs: (class: "site-header"))[
   #el("nav", attrs: ("aria-label": "Site"))[
+    #el("a", attrs: (
+      href: "/",
+      "aria-label": "Main website",
+      title: "Main website",
+    ))[/]
     #el("a", attrs: (href: home))[Chapters]
     #el("a", attrs: (
       href: "https://github.com/kevinlopezandrade/scaling-book-solutions",
