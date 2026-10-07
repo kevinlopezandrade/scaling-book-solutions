@@ -3,8 +3,11 @@
 
 = Scaling Book Exercises -- Chapter 5
 
-Transcribed from handwritten solutions.
-#link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-5/c5-handwritten.pdf")[Source]
+#block[
+  #link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-5/c5-handwritten.pdf")[Handwritten solutions].
+  Watch me solve:
+  #link("https://www.youtube.com/watch?v=NaH30lmvm-o")[Part~0]
+] <chapter-resources>
 
 == Shared setup from the book
 

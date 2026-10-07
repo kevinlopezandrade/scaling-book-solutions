@@ -3,8 +3,12 @@
 
 = Scaling Book Exercises -- Chapter 4
 
-Transcribed from handwritten solutions.
-#link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-4/c4-handwritten.pdf")[Source]
+#block[
+  #link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-4/c4-handwritten.pdf")[Handwritten solutions].
+  Watch me solve:
+  #link("https://www.youtube.com/watch?v=-AnMnnQ-tWY")[Part~0] ·
+  #link("https://www.youtube.com/watch?v=TGPI8oqOYc8")[Part~1]
+] <chapter-resources>
 
 == Exercise 1 -- Parameter count, attention fraction, and KV cache
 

@@ -3,8 +3,14 @@
 
 = Scaling Book Exercises -- Chapter 3
 
-Transcribed from handwritten solutions.
-#link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-3/c3-handwritten.pdf")[Source]
+#block[
+  #link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-3/c3-handwritten.pdf")[Handwritten solutions].
+  Watch me solve:
+  #link("https://www.youtube.com/watch?v=X7pVilUQiag")[Part~0] ·
+  #link("https://www.youtube.com/watch?v=P-RgS5K1jb0")[Part~1] ·
+  #link("https://www.youtube.com/watch?v=1GK_Tr5Z-mE")[Part~2] ·
+  #link("https://www.youtube.com/watch?v=jQ8DQL981n0")[Part~3]
+] <chapter-resources>
 
 == Exercise 1 -- replicated sharding
 

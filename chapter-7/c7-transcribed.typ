@@ -3,8 +3,9 @@
 
 = Scaling Book Exercises -- Chapter 7
 
-Transcribed from handwritten solutions.
-#link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-7/c7-handwritten.pdf")[Source]
+#block[
+  #link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-7/c7-handwritten.pdf")[Handwritten solutions]
+] <chapter-resources>
 
 == Shared model setup for Exercises 1-7
 

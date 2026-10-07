@@ -3,8 +3,9 @@
 
 = Scaling Book Exercises -- Chapter 8
 
-Transcribed from handwritten solutions.
-#link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-8/c8-handwritten.pdf")[Source]
+#block[
+  #link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-8/c8-handwritten.pdf")[Handwritten solutions]
+] <chapter-resources>
 
 *Remark:* The following questions don't appear numbered in the Scaling Book. I will number them in order of appearance as 0.X, where $X in NN$ and $X >= 1$.
 

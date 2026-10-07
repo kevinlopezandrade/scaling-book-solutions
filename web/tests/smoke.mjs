@@ -38,6 +38,16 @@ for (const route of ["index.html", ...chapters.map((chapter) => chapter.route)])
   assert.equal(new Set(ids).size, ids.length, `${route}: duplicate element IDs.`);
 
   if (route !== "index.html") {
+    const resources = $("article > .chapter-resources");
+    assert.equal(resources.length, 1, `${route}: expected one chapter resource block.`);
+    assert($("article").children().first().hasClass("chapter-resources"), `${route}: resources must precede the solutions.`);
+    const chapter = chapters.find((chapter) => chapter.route === route);
+    assert.equal(
+      resources.find("a").first().attr("href"),
+      `https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-${chapter.number}/c${chapter.number}-handwritten.pdf`,
+      `${route}: the first resource must link to this chapter's handwritten solutions.`,
+    );
+
     const sections = $("article h3").toArray();
     assert.equal($("merror").length, 0, `${route}: MathML contains an error.`);
     const preload = $('link[rel="preload"][as="font"]');

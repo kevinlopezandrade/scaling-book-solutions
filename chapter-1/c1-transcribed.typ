@@ -3,8 +3,11 @@
 
 = Scaling Book Exercises -- Chapter 1
 
-Transcribed from handwritten solutions.
-#link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-1/c1-handwritten.pdf")[Source]
+#block[
+  #link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-1/c1-handwritten.pdf")[Handwritten solutions].
+  Watch me solve:
+  #link("https://www.youtube.com/watch?v=mxhYi_xr-Vg")[Part~0]
+] <chapter-resources>
 
 == Exercise 1 -- int8 matmul
 

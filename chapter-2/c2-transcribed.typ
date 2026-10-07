@@ -3,10 +3,12 @@
 
 = Scaling Book Exercises — Chapter 2
 
-Transcribed from handwritten solutions.
-#link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-2/c2-handwritten.pdf")[Source]
-
-This document contains only the handwritten solution content from the scan, with exercise statements copied from the Chapter 2 book markdown and kept separate from the solutions.
+#block[
+  #link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-2/c2-handwritten.pdf")[Handwritten solutions].
+  Watch me solve:
+  #link("https://www.youtube.com/watch?v=LsJlbMIXNAQ")[Part~0] ·
+  #link("https://www.youtube.com/watch?v=dLSikhGPiIc")[Part~1]
+] <chapter-resources>
 
 == Exercise 1 — Bounding LLM latency
 

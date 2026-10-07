@@ -108,7 +108,6 @@
     #el("main", attrs: (class: "post", id: "top"))[
       #el("header", attrs: (class: "post-heading"))[
         #title()
-        #el("p", attrs: (class: "post-meta"))[Worked solutions]
       ]
       #el("div", attrs: (class: "post-body"))[
         #el("aside", attrs: (class: "toc", "aria-label": "On this page"))[

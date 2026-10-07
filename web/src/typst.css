@@ -11,6 +11,14 @@
   font-family: "New Computer Modern Math Book", math;
 }
 
+/* Keep chapter resources distinct from the worked solutions. */
+.transcription .chapter-resources {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
 /* Typst-specific image alignment and native MathML layout. */
 .typst-align[data-alignment="center"] > img {
   display: block;
