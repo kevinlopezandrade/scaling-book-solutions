@@ -4,7 +4,9 @@
 = Scaling Book Exercises -- Chapter 6
 
 #block[
-  #link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-6/c6-handwritten.pdf")[Handwritten solutions]
+  #link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-6/c6-handwritten.pdf")[Handwritten solutions].
+  Watch me solve:
+  #link("https://www.youtube.com/watch?v=_8NNpqd5SxY")[Part~0]
 ] <chapter-resources>
 
 Remark: The following questions don't appear numbered in the scaling book. I will number them in order of appearance as 0.X where $X in NN$ and $X >= 1$.

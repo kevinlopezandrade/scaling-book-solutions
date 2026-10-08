@@ -4,7 +4,11 @@
 = Scaling Book Exercises -- Chapter 7
 
 #block[
-  #link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-7/c7-handwritten.pdf")[Handwritten solutions]
+  #link("https://github.com/kevinlopezandrade/scaling-book-solutions/blob/main/chapter-7/c7-handwritten.pdf")[Handwritten solutions].
+  Watch me solve:
+  #link("https://www.youtube.com/watch?v=3Uq8aV547r8")[Part~0] ·
+  #link("https://www.youtube.com/watch?v=kgRYR8200D8")[Part~1] ·
+  #link("https://www.youtube.com/watch?v=j_6F86LFjgM")[Part~2]
 ] <chapter-resources>
 
 == Shared model setup for Exercises 1-7
